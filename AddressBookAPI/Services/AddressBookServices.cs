@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Services
 {
-    public class AddressBookServices :  IAddressBookServices 
+    public class AddressBookServices : IAddressBookServices
     {
 
         private readonly IConfiguration _configuration;
@@ -33,26 +34,87 @@ namespace AddressBookAPI.Services
             _addressBookRepository = addressBookRepository;
         }
 
-        
-        public async Task<logInResponse> VerifyUser(logInModel logInModel) 
+        public string? ValidateEmail(userDTO userModel)
         {
-            
-            var userPassword = _addressBookRepository.loginDetails(logInModel.userName);
-            if(userPassword == null)
+            foreach (emailDTO item in userModel.Email)
+            {
+                string validEmail = item.emailAddress;
+                try
+                {
+                    MailAddress mail = new MailAddress(validEmail);
+                    bool isTrue =  mail.Host.Contains(".");
+                    return isTrue ? null : validEmail;
+                }
+                catch (Exception)
+                {
+                    return validEmail; 
+                }
+            }
+            return null;
+        }
+
+        public string ValidatePhone(userDTO userModel)
+        {
+            foreach (phoneDTO item in userModel.Phone) 
+            { 
+                if (!(item.phoneNumber.Length == 10))
+                {
+                    return item.phoneNumber; //BadRequest(new validationErrorModel { type = "Phone", description = "Invalid Phone Number : " + item.phoneNumber });
+                }
+            }
+            return null;
+        }
+
+        public string PasswordValidations(signupDTO sinupModel)
+        {
+            if (!sinupModel.password.Any(char.IsUpper))
+            {
+                return enumList.Constants.upperCase.ToString(); //BadRequest(new validationErrorModel { type = "Upper case Exception", description = "One Uppercase Required" });
+            }
+            if (sinupModel.password.Contains(" "))
+            {
+                return enumList.Constants.space.ToString();//BadRequest(new validationErrorModel { description = "Do not Contain spaces" });
+            }
+            if (sinupModel.password.Length < 6)
+            {
+                return enumList.Constants.length.ToString(); //BadRequest(new validationErrorModel { description = "Length of password shoud be minimum 6" });
+            }
+            string specialCh = @"%!@#$%^&*()?/>.<,:;'\|}]{[_~`+=-" + "\"";
+            char[] specialh = specialCh.ToCharArray();
+            int i;
+            for (i = 0; i < sinupModel.password.Length; i++)
+            {
+                if (specialCh.Contains(sinupModel.password[i]))
+                {
+                    break;
+                }
+            }
+            if (i == sinupModel.password.Length)
+            {
+                return enumList.Constants.specialCharacter.ToString();
+            }
+            return null;
+}
+
+public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
+        {
+
+            string userPassword = _addressBookRepository.loginDetails(logInModel.userName);
+            if (userPassword == null)
             {
                 return null;
             }
-            
 
-            var text = userPassword;
+
+            string text = userPassword;
             SymmetricAlgorithm algorithm = DES.Create();
-            ICryptoTransform transform = algorithm.CreateDecryptor( this.key, this.iv);
+            ICryptoTransform transform = algorithm.CreateDecryptor(this.key, this.iv);
             byte[] inputbuffer = Convert.FromBase64String(text);
             byte[] outputBuffer = transform.TransformFinalBlock(inputbuffer, 0, inputbuffer.Length);
-            var p =  Encoding.Unicode.GetString(outputBuffer);
+            string password = Encoding.Unicode.GetString(outputBuffer);
 
 
-            if (p == logInModel.Password)
+            if (password == logInModel.Password)
             {
                 var tokenhandler = new JwtSecurityTokenHandler();
                 var tokenKey = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]);
@@ -70,7 +132,7 @@ namespace AddressBookAPI.Services
 
                 var token = tokenhandler.CreateToken(tokenDeprictor);
                 var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-                var response = new logInResponse()
+                var response = new logInResponseDTO()
                 {
                     jwt = tokenString,
                     type = "Bearer"
@@ -80,7 +142,7 @@ namespace AddressBookAPI.Services
             return null;
 
         }
-        public async Task<List<userModel>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder)
+        public async Task<List<userDTO>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder)
         {
             var accounts = _addressBookRepository.ListOfAccounts(sortBy);
             if (accounts == null)
@@ -88,7 +150,7 @@ namespace AddressBookAPI.Services
                 return null;
             }
             int count = 0;
-            var accountsList = new List<userModel>();
+            var accountsList = new List<userDTO>();
             foreach (var item in accounts)
             {
                 var user = AddressBookMaping(item);
@@ -102,7 +164,7 @@ namespace AddressBookAPI.Services
             return accountsList;
         }
 
-        public async Task<Guid?> UpdateAddressBook(Guid id, userModel userModel)
+        public async Task<Guid?> UpdateAddressBook(Guid id, userDTO userModel)
         {
             var account = _addressBookRepository.GetAccountCount(id);
             if (account == null)
@@ -142,15 +204,15 @@ namespace AddressBookAPI.Services
             return id;
 
         }
-        public async Task<int> GetAddressBookCount()
+        public int GetAddressBookCount()
         {
             return _addressBookRepository.GetAddressBookCount();
         }
-        public async Task<Tuple<string, string>> AddNewAddressBook(userModel UserModel)
+        public async Task<Tuple<string, string>> AddNewAddressBook(userDTO UserModel)
         {
 
             var emailList = _addressBookRepository.EmailList();
-            var phoneList = _addressBookRepository.PhoneList(); 
+            var phoneList = _addressBookRepository.PhoneList();
 
             foreach (var email in UserModel.Email)
             {
@@ -176,7 +238,7 @@ namespace AddressBookAPI.Services
                     return Tuple.Create(enumList.Constants.address.ToString(), jsonobj);
                 }
             }
-            
+
             var newId = Guid.NewGuid();
 
             var userModel = new user()
@@ -214,16 +276,16 @@ namespace AddressBookAPI.Services
                     phoneNumber = s.phoneNumber
                 }).ToList()
             };
-          
+
             try
             {
-                  _addressBookRepository.saveToDataBase(userModel);
-                
-                return  Tuple.Create(newId.ToString(), string.Empty); ;
+                _addressBookRepository.SaveToDataBase(userModel);
+
+                return Tuple.Create(newId.ToString(), string.Empty); ;
             }
             catch
             {
-                return Tuple.Create(string.Empty,string.Empty);
+                return Tuple.Create(string.Empty, string.Empty);
             }
             return null;
 
@@ -232,7 +294,7 @@ namespace AddressBookAPI.Services
         public async Task<Guid?> DeletAddressBook(Guid id)
         {
 
-            var account = _addressBookRepository.GetAccountCount(id); 
+            var account = _addressBookRepository.GetAccountCount(id);
             if (account == null)
             {
                 return null;
@@ -242,7 +304,7 @@ namespace AddressBookAPI.Services
 
         }
 
-        public async Task<UploadResponse> UploadFile(IFormFile file)
+        public async Task<UploadResponseDTO> UploadFile(IFormFile file)
         {
 
             MemoryStream ms = new MemoryStream();
@@ -253,10 +315,10 @@ namespace AddressBookAPI.Services
             {
                 Id = Guid.NewGuid(),
                 field = bytes,
-                
+
             };
 
-            var response = new UploadResponse
+            var response = new UploadResponseDTO
             {
                 Id = fileObj.Id,
                 fileName = file.FileName,
@@ -265,13 +327,13 @@ namespace AddressBookAPI.Services
                 size = file.Length,
                 fileContent = null
             };
-            _addressBookRepository.saveFileToDataBase(fileObj);
+            _addressBookRepository.SaveFileToDataBase(fileObj);
 
             return response;
         }
         public byte[] Download(Guid id)
         {
-            var bytes = _addressBookRepository.GetFile(id); 
+            var bytes = _addressBookRepository.GetFile(id);
             if (bytes == null)
             {
                 return null;
@@ -279,9 +341,9 @@ namespace AddressBookAPI.Services
             return bytes;
         }
 
-        public async Task<userModel> GetAddressBook(Guid id)
+        public async Task<userDTO> GetAddressBook(Guid id)
         {
-            var account = await _addressBookRepository.GetAddressBook(id);   
+            var account = await _addressBookRepository.GetAddressBook(id);
             if (account == null)
             {
                 return null;
@@ -290,73 +352,61 @@ namespace AddressBookAPI.Services
             return response;
         }
 
-        public userModel AddressBookMaping(user user)
+        public userDTO AddressBookMaping(user user)
         {
             var users =
-                new userModel()
+                new userDTO()
                 {
                     Id = user.Id,
                     firstName = user.firstName,
                     lastName = user.lastName,
                     Email = user.email.Select(s =>
-                      new emailModel
+                      new emailDTO
                       {
                           emailAddress = s.emailAddress,
-                          type = new typeModel { key = s.refTermId }
+                          type = new typeDTO { key = s.refTermId }
                       }).ToList(),
 
                     Address = user.address.Select(s =>
-                      new addressModel
+                      new addressDTO
                       {
                           line1 = s.line1,
                           line2 = s.line2,
-                          type = new typeModel { key = s.refTermId },
+                          type = new typeDTO { key = s.refTermId },
                           stateName = s.stateName,
                           city = s.city,
-                          country = new typeModel { key = s.refTermId },
+                          country = new typeDTO { key = s.refTermId },
                           zipCode = s.zipCode
                       }).ToList(),
 
                     Phone = user.phone.Select(s =>
-                      new phoneModel
+                      new phoneDTO
                       {
-                          type = new typeModel { key = s.refTermId },
+                          type = new typeDTO { key = s.refTermId },
                           phoneNumber = s.phoneNumber
                       }).ToList()
                 };
             return users;
         }
 
-        public int SignupAdmin(signupModel signupModel)
+        public int? SignupAdmin(signupDTO signupModel)
         {
 
             string text = signupModel.password;
+            bool isExists = _addressBookRepository.isUserNameExists(signupModel.userName);
+            if (isExists)
+            {
+                return null;
+            }
             SymmetricAlgorithm algorithm = DES.Create();
             ICryptoTransform transform = algorithm.CreateEncryptor(this.key, this.iv);
             byte[] inputbuffer = Encoding.Unicode.GetBytes(text);
             byte[] outputBuffer = transform.TransformFinalBlock(inputbuffer, 0, inputbuffer.Length);
             var password = Convert.ToBase64String(outputBuffer);
             var loginObj = new Login { userName = signupModel.userName, password = password };
-            return  _addressBookRepository.SinupAdmin(loginObj);
+            return _addressBookRepository.SinupAdmin(loginObj);
 
-
-
-        }
-
-        public int  Seed()
-        {
-            string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\SeedingDataFromCSV\Book1.csv";
-            string ReadCSV = File.ReadAllText(path);
-            var data = ReadCSV.Split('\r');
-            var list = new List<refTerm>();
-            foreach (var item in data)
-            {
-                var row = item.Split(",");
-                var refObj = new refTerm { Id = Guid.Parse(row[0].ToString()), key = row[1].ToString(), description = row[2].ToString() };
-                list.Add(refObj);
-            }
-            return _addressBookRepository.SeedData(list);
         }
     }
-  
+
 }

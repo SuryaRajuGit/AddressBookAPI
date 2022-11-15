@@ -32,12 +32,20 @@ namespace AddressBookAPI.Repository
         }
         public string loginDetails(string userName)
         {
-            return  _context.Login.Where(s => s.userName == userName).Select(s => s.password).FirstOrDefault();
+            return _context.Login.Where(s => s.userName == userName).Select(s => s.password).FirstOrDefault();
+            
         }
+
+        public bool isUserNameExists(string text)
+        {
+            var listOfAdmins =  _context.Login.Select(s => s.userName).ToList();
+            return listOfAdmins.Contains(text);
+        }
+
 
         public IEnumerable<user> ListOfAccounts(string sortBy)
         {
-             var accounts  =   sortBy == enumList.Constants.firstName.ToString() ?
+             var accounts  = sortBy == enumList.Constants.firstName.ToString() ?
                 _context.User.Include(e => e.email).Include(a => a.address).Include(p => p.phone).OrderBy(s => s.firstName) :
                 _context.User.Include(e => e.email).Include(a => a.address).Include(p => p.phone).OrderBy(s => s.lastName);
             return accounts;
@@ -52,16 +60,6 @@ namespace AddressBookAPI.Repository
         {
             _context.Update(account);
             _context.SaveChanges();
-        }
-
-        public  int SeedData(List<refTerm> data)
-        {
-            foreach (var item in data)
-            {
-                _context.Add(item);
-            }
-            _context.SaveChanges();
-            return data.Count();
         }
 
         public int GetAddressBookCount()
@@ -85,15 +83,15 @@ namespace AddressBookAPI.Repository
             var listOfAddresses = new List<string>();
             foreach (var item in _context.Address)
             {
-                var addressObj = new addressModel
+                var addressObj = new addressDTO
                 {
                     line1 = item.line1,
                     line2 = item.line2,
                     city = item.city,
                     zipCode = item.zipCode,
                     stateName = item.stateName,
-                    type = new typeModel {key= item.refTermId },
-                    country = new typeModel { key = item.refTermId },  
+                    type = new typeDTO {key= item.refTermId },
+                    country = new typeDTO { key = item.refTermId },  
                 };
                 string josnObj = JsonConvert.SerializeObject(addressObj);
                 listOfAddresses.Add(josnObj);
@@ -106,13 +104,13 @@ namespace AddressBookAPI.Repository
              _context.SaveChangesAsync();
         }
 
-        public void  saveToDataBase(user account)
+        public void  SaveToDataBase(user account)
         {
             _context.Add(account);
             _context.SaveChanges();
             
         }
-        public void saveFileToDataBase(asset fileObj)
+        public void SaveFileToDataBase(asset fileObj)
         {      
             _context.Add(fileObj);
             _context.SaveChanges();       

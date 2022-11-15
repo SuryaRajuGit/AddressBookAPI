@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class phoneModel
+    
+    public  class emailDTO
     {
         [Required]
-        public string phoneNumber { get; set; }
+        public string emailAddress { get; set; }
 
         [Required]
-        public typeModel type { get; set; }
+        public typeDTO type { get; set; }
+ 
     }
 }

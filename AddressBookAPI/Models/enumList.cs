@@ -7,13 +7,17 @@ namespace AddressBookAPI.Models
 {
     public class enumList
     {
-        public enum Constants{
+        public enum Constants {
             firstName,
             lastName,
             one = 1,
             phone,
             email,
-            address
-    }
+            address,
+            upperCase,
+            space,
+            length,
+            specialCharacter }
+    
     }
 }

@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class signupModel
+    public class signupDTO
     {
         [Required]
         public string userName {get;set;}
 
         [Required]
-        [MinLength(5)]
         public string password { get; set; }
     }
 }

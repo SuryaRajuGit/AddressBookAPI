@@ -10,26 +10,30 @@ namespace AddressBookAPI.Services
 {
     public interface IAddressBookServices
     {
-        public Task<logInResponse> VerifyUser(logInModel logInModel);
+        public Task<logInResponseDTO> VerifyUser(logInDTO logInModel);
 
-        public Task<int> GetAddressBookCount();
+        public int GetAddressBookCount();
 
         public Task<Guid?> DeletAddressBook(Guid id);
 
-        public Task<Guid?> UpdateAddressBook(Guid id, userModel userModel);
+        public Task<Guid?> UpdateAddressBook(Guid id, userDTO userModel);
 
-        public Task<List<userModel>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder);
+        public Task<List<userDTO>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder);
 
-        public Task<Tuple<string, string>> AddNewAddressBook(userModel UserModel);
+        public Task<Tuple<string, string>> AddNewAddressBook(userDTO UserModel);
 
-        public Task<userModel> GetAddressBook(Guid id);
+        public Task<userDTO> GetAddressBook(Guid id);
 
-        public Task<UploadResponse> UploadFile(IFormFile file);
+        public Task<UploadResponseDTO> UploadFile(IFormFile file);
 
         public byte[] Download(Guid id);
 
-        public int SignupAdmin(signupModel signupModel);
+        public int? SignupAdmin(signupDTO signupModel);
 
-        public int Seed();
+        public string ValidateEmail(userDTO userModel);
+
+        public string ValidatePhone(userDTO userModel);
+
+        public string PasswordValidations(signupDTO sinupModel);
     }
 }

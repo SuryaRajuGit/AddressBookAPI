@@ -31,9 +31,9 @@ namespace AddressBookAPI.Repository
 
         public void  RemoveAccount(user account);
 
-        public void saveToDataBase(user account);
+        public void SaveToDataBase(user account);
 
-        public void saveFileToDataBase(asset fileObj);
+        public void SaveFileToDataBase(asset fileObj);
 
         public byte[] GetFile(Guid id);
 
@@ -41,6 +41,8 @@ namespace AddressBookAPI.Repository
 
         public int SinupAdmin(Login sinupModel);
 
-        public int SeedData(List<refTerm> data);
+        public bool isUserNameExists(string text);
+
+
     }
 }

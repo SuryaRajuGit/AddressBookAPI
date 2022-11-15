@@ -21,9 +21,5 @@ namespace AddressBookAPI.Data
         public ICollection<email> email { get; set; }
 
         public ICollection<phone> phone { get; set; }
-
-       
-
-       
     }
 }

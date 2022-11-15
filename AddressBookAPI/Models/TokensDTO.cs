@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class Tokens
+    public class TokensDTO
     {
         public string Token { get; set; }
 

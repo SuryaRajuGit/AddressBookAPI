@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class UploadResponse
+    public class UploadResponseDTO
     {
         public Guid Id { get; set; }
 

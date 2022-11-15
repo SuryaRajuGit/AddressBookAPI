@@ -5,14 +5,15 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class reftermModel
+    public class assetDTO
     {
         public Guid Id { get; set; }
 
-        public string key { get; set; }
+        public string fileName { get; set; }
 
-        public string description { get; set; }
+        public byte[] file { get; set; }
 
-
+        public Guid userId { get; set; }
+        
     }
 }

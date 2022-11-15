@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class Image
+    public  class typeDTO
     {
-        public System.Drawing.ImageConverter image { get; set; }
+        public Guid key { get; set; }
     }
 }

@@ -12,7 +12,7 @@ namespace AddressBookAPI.Helpers
     {
         public ApplicationMapper()
         {
-            CreateMap<user, userModel>().ReverseMap();
+            CreateMap<user, userDTO>().ReverseMap();
         }
     }
 }

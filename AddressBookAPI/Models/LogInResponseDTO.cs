@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class ResponseGetCount
-    {
-        public int count;
+    public class logInResponseDTO
+    { 
+        public string jwt { get; set; }
+        public string type { get; set; }
+      
     }
 }

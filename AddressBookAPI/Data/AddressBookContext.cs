@@ -3,17 +3,18 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AddressBookAPI.Data
 {
-    public class AddressBookContext : IdentityDbContext<ApplicationUser>
+    public class AddressBookContext : DbContext
     {
         public AddressBookContext(DbContextOptions<AddressBookContext> options) : base(options)
-            {
+        {
 
-            }
+        }
 
         public DbSet<address> Address { get; set; }
 
@@ -32,5 +33,29 @@ namespace AddressBookAPI.Data
         public DbSet<user> User { get; set; }
 
         public DbSet<Login> Login { get; set; }
+
+
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Migrations\SeedingDataFromCSV\Book1.csv";
+            string ReadCSV = File.ReadAllText(path);
+            var data = ReadCSV.Split('\r');
+            var list = new List<refTerm>();
+            foreach (var item in data)
+            {
+                var row = item.Split(",");
+                var refObj = new refTerm { Id = Guid.Parse(row[0].ToString()), key = row[1].ToString(), description = row[2].ToString() };
+                list.Add(refObj);
+            }
+
+            modelBuilder.Entity<refTerm>()
+        .HasData(list);
+        }
+
+
+
     }
+
 }

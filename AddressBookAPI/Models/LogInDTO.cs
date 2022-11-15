@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class logInModel
+    public class logInDTO
     {
         public int Id { get; set; }
 

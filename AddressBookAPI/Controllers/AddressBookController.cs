@@ -25,116 +25,80 @@ namespace AddressBookAPI.Controllers
     public class AddressBookController : ControllerBase
     {
         private readonly IAddressBookServices _addressBookServices;
-        private readonly AddressBookRepository addressBookRepository;
 
         public AddressBookController(IAddressBookServices addressBookServices)
         {
-            _addressBookServices = addressBookServices;
-           
+            _addressBookServices = addressBookServices; 
         }
 
         [HttpPost]
         [Route("account")]
-        public async Task<IActionResult> AddNewAddressBook([FromBody]userModel userModel)
+        public async Task<IActionResult> AddNewAddressBook([FromBody]userDTO userModel)
         {
-            foreach (var item in userModel.Email)
+            string isValidEmail = _addressBookServices.ValidateEmail(userModel);
+            if (isValidEmail != null)
             {
-                string invalidEmail = item.emailAddress;
-                try
-                {
-                    var mail = new MailAddress(invalidEmail);
-                    bool isValidEmail = mail.Host.Contains(".");
-                    if (!isValidEmail)
-                    {
-                        return BadRequest(new validationErrorModel { type = "Email", description = "Invalid Email" });
-                    }
-                }
-                catch (Exception)
-                {
-                    return BadRequest(new validationErrorModel { type = "Email", description = "Invalid Email : "+ invalidEmail });
-                }
-            }
-            foreach (var item in userModel.Phone)
-            {
-                if(!(item.phoneNumber.Length == 10))
-                {
-                    return BadRequest(new validationErrorModel { type = "Phone", description = "Invalid Phone Number : "+item.phoneNumber  });
-                }
+                return BadRequest(new validationErrorDTO { type = "Email", description = "Invalid Email "+isValidEmail });
             }
 
-            var response = await _addressBookServices.AddNewAddressBook(userModel);
+            string isValidPhone = _addressBookServices.ValidatePhone(userModel);
+            if(isValidPhone != null)
+            {
+                return BadRequest(new validationErrorDTO { type = "Phone", description = "Invalid Phone Number : " + isValidPhone });
+            }
+
+            Tuple<string,string> response = await _addressBookServices.AddNewAddressBook(userModel);
      
             switch (response.Item1)
             {
-                case var value when value == enumList.Constants.email.ToString():
+                case string value when value == enumList.Constants.email.ToString():
                     return StatusCode(409, "Email Already Exists " + response.Item2);
                     break;
-                case var value when value == enumList.Constants.address.ToString():
+                case string value when value == enumList.Constants.address.ToString():
                     return StatusCode(409, "Address Already Exists \n"+response.Item2);
                     break;
-                case var value when value == enumList.Constants.phone.ToString():
+                case string value when value == enumList.Constants.phone.ToString():
                     return StatusCode(409, "phone number already Exists " + response.Item2);
                     break;
-                case var value when value == string.Empty:
+                case string value when value == string.Empty:
                     return NotFound();
                     break;
                 default:
-                    var id = Guid.Parse(response.Item1);
+                    Guid id = Guid.Parse(response.Item1);
                     return StatusCode(201, id);
                     break;
             }
         }
-        [HttpPost]
-        [Route("seed_csv")]
-        public async Task<ActionResult> Seed()
-        {
-            try
-            {
-                var count = _addressBookServices.Seed();
-                return Ok(count);
-            }
-            catch
-            {
-                return BadRequest();
-            }
-                  
-        }
-
 
         [HttpPost]
         [Route("sinup")]
-        public async Task<ActionResult> SinUpAdmin([FromBody] signupModel sinupModel)
+        public async Task<ActionResult> SinUpAdmin([FromBody] signupDTO sinupModel)
         {
-            
-            if (!sinupModel.password.Any(char.IsUpper) )
-            {
-                return BadRequest("One Uppercase Required");
-            }
-            if (sinupModel.password.Contains(" "))
-            {
-                return BadRequest("Do not Contain spaces");
-            }
-            if(sinupModel.password.Length < 6)
-            {
-                return BadRequest("Length of password shoud be minimum 6");
-            }
-            string specialCh = @"%!@#$%^&*()?/>.<,:;'\|}]{[_~`+=-" + "\"";
-            char[] specialh = specialCh.ToCharArray();
-            int i;
-            for ( i = 0; i < sinupModel.password.Length; i++)
-            {
-                if( specialCh.Contains(sinupModel.password[i]) )
-                {
-                    break;
-                }
-            }
-            if(i == sinupModel.password.Length)
-            {
-                return BadRequest("Contain one special character");
-            }
+            string isValid = _addressBookServices.PasswordValidations(sinupModel);
 
-            var response =  _addressBookServices.SignupAdmin(sinupModel);
-            return Ok(response);
+            switch (isValid)
+            {
+                case string value when value == enumList.Constants.upperCase.ToString():
+                    return BadRequest(new validationErrorDTO { type = "Upper case Exception", description = "One Uppercase Required" });
+                    break;
+                case string value when value == enumList.Constants.space.ToString():
+                    return BadRequest(new validationErrorDTO { description = "Do not Contain spaces" });
+                    break;
+                case string value when value == enumList.Constants.length.ToString():
+                    return BadRequest(new validationErrorDTO { description = "Length of password shoud be minimum 6" });
+                    break;
+                case string value when value == enumList.Constants.specialCharacter.ToString():
+                    return BadRequest(new validationErrorDTO { description = "shouild conatain atleast one special character" });
+                    break;
+            }
+            var response = _addressBookServices.SignupAdmin(sinupModel);
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return StatusCode(409, "username already exists");
+
+
         }
 
 
@@ -142,7 +106,7 @@ namespace AddressBookAPI.Controllers
         [Route("account/{id:Guid}")]
         public async Task<IActionResult>  DeleteAddressBook(Guid id)
         {
-             var response = await _addressBookServices.DeletAddressBook(id);
+             Guid? response = await _addressBookServices.DeletAddressBook(id);
             if(response == null)
             {
                 return NotFound();
@@ -153,9 +117,9 @@ namespace AddressBookAPI.Controllers
 
         [HttpPut]
         [Route("account/{id:Guid}")]
-        public async Task<IActionResult> UpdateAddressBook(Guid id, [FromBody] userModel userModel)
+        public async Task<IActionResult> UpdateAddressBook(Guid id, [FromBody] userDTO userModel)
         {
-            var response = await _addressBookServices.UpdateAddressBook(id, userModel);
+            Guid? response = await _addressBookServices.UpdateAddressBook(id, userModel);
             if(response == null)
             {
                 return NotFound();
@@ -165,13 +129,13 @@ namespace AddressBookAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("auth/signing")]
-        public async Task<IActionResult> VerifyUser([FromBody]logInModel logInModel ) 
+        [Route("auth/signin")]
+        public async Task<IActionResult> VerifyUser([FromBody]logInDTO logInModel ) 
         {
-            var response = await _addressBookServices.VerifyUser(logInModel);
+            logInResponseDTO response = await _addressBookServices.VerifyUser(logInModel);
             if (response == null)
             {
-                return Unauthorized();
+                return Unauthorized("Wrong Password");
               
             }
             return Ok(response);
@@ -179,7 +143,7 @@ namespace AddressBookAPI.Controllers
 
         [HttpGet]
         [Route("account")]
-        public async Task<ActionResult<List<userModel>>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder)
+        public async Task<ActionResult<List<userDTO>>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder)
         {
              var response = await _addressBookServices.GetAllAddressBooks(size,pageNo,sortBy,sortOrder);           
              if (response == null)
@@ -193,15 +157,15 @@ namespace AddressBookAPI.Controllers
         [Route("account/count")]
         public async Task<IActionResult> GetAddressBookCount()
         {
-            var count = await _addressBookServices.GetAddressBookCount();
+            int count =  _addressBookServices.GetAddressBookCount();
             return Ok(count);
         }
 
         [HttpGet]
         [Route("get/account/{id:Guid}")]
-        public async Task<ActionResult<userModel>> GetAddressBook(Guid id)
+        public async Task<ActionResult<userDTO>> GetAddressBook(Guid id)
         {
-            var response = await _addressBookServices.GetAddressBook(id);
+            userDTO response = await _addressBookServices.GetAddressBook(id);
             if(response == null)
             {
                 return NotFound();
@@ -213,7 +177,7 @@ namespace AddressBookAPI.Controllers
         [Route("upload")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            var response = await _addressBookServices.UploadFile(file);
+            UploadResponseDTO response = await _addressBookServices.UploadFile(file);
             return Ok(response);
         }
 
@@ -221,7 +185,7 @@ namespace AddressBookAPI.Controllers
         [Route("asset/downloadFile/{id:Guid}")]
         public async Task<IActionResult> Download(Guid id)
         {
-            var fileBytes = _addressBookServices.Download(id);
+            byte[] fileBytes = _addressBookServices.Download(id);
             if(fileBytes == null)
             {
                 return NotFound();
