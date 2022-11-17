@@ -20,7 +20,7 @@ namespace AddressBookAPI.Services
 
         public Task<List<userDTO>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder);
 
-        public Task<Tuple<string, string>> AddNewAddressBook(userDTO UserModel);
+        public Task<ErrorDTO> AddNewAddressBook(userDTO UserModel);
 
         public Task<userDTO> GetAddressBook(Guid id);
 
@@ -28,12 +28,9 @@ namespace AddressBookAPI.Services
 
         public byte[] Download(Guid id);
 
-        public int? SignupAdmin(signupDTO signupModel);
+        public  Task<int?> SignupAdmin(signupDTO signupModel);
 
-        public string ValidateEmail(userDTO userModel);
+        public Task<Guid?> saveToDatabase(userDTO userModel);
 
-        public string ValidatePhone(userDTO userModel);
-
-        public string PasswordValidations(signupDTO sinupModel);
     }
 }

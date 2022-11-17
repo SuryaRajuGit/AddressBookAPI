@@ -60,6 +60,10 @@ namespace AddressBookAPI
             services.AddControllers();
             services.AddTransient<IAddressBookRepository, AddressBookRepository>();
             services.AddTransient<IAddressBookServices, AddressBookServices>();
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             services.AddControllersWithViews()
             .AddNewtonsoftJson(options =>

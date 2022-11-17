@@ -1,5 +1,6 @@
 ﻿using AddressBookAPI.Data;
 using AddressBookAPI.Models;
+using AddressBookAPI.Repository;
 using AddressBookAPI.Services;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookUnitTest
 {
-    class AddressBookClassFake //: IAddressBookServices
+    class AddressBookClassFake : IAddressBookRepository
     {
         List<user> list = new List<user>()
         {
@@ -108,59 +109,80 @@ namespace AddressBookUnitTest
 
         }, };
 
-
-        public Task<Tuple<string, string>> AddNewAddressBook(userDTO UserModel)
+        public List<string> AdderessList()
         {
             throw new NotImplementedException();
         }
 
-        public Task<Guid?> DeletAddressBook(Guid id)
+        public List<string> EmailList()
         {
             throw new NotImplementedException();
         }
 
-        public byte[] Download(Guid id)
+        public user GetAccountCount(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<userDTO> GetAddressBook(Guid id)
+        public async  Task<user> GetAddressBook(Guid id)
         {
-            throw new NotImplementedException();
+            var r = list.Where(w => w.Id == id).FirstOrDefault();
+            return r;
         }
 
         public int GetAddressBookCount()
         {
-            return 2;
-
+            var x = list.Count();
+            return x;
         }
 
-        public Task<List<userDTO>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder)
+        public byte[] GetFile(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public int Seed()
+        public bool isUserNameExists(string text)
         {
             throw new NotImplementedException();
         }
 
-        public int SignupAdmin(signupDTO signupModel)
+        public IEnumerable<user> ListOfAccounts(string sortBy)
+        {
+            var x = list;
+            return x;
+        }
+
+        public string loginDetails(string userName)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Guid?> UpdateAddressBook(Guid id, userDTO userModel)
+        public List<string> PhoneList()
         {
             throw new NotImplementedException();
         }
 
-        public Task<UploadResponseDTO> UploadFile(IFormFile file)
+        public void RemoveAccount(user account)
         {
             throw new NotImplementedException();
         }
 
-        public Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
+        public void SaveFileToDataBase(asset fileObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveToDataBase(user account)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int SinupAdmin(Login sinupModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateToDataBase(user account)
         {
             throw new NotImplementedException();
         }

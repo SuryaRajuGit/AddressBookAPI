@@ -10,6 +10,7 @@ namespace AddressBookAPI.Models
     public  class emailDTO
     {
         [Required]
+        [EmailAddress(ErrorMessage ="Enter Valid Email Address")]
         public string emailAddress { get; set; }
 
         [Required]

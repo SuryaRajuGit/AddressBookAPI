@@ -38,16 +38,17 @@ namespace AddressBookAPI.Repository
 
         public bool isUserNameExists(string text)
         {
-            var listOfAdmins =  _context.Login.Select(s => s.userName).ToList();
+            List<string> listOfAdmins =  _context.Login.Select(s => s.userName).ToList();
             return listOfAdmins.Contains(text);
         }
 
 
         public IEnumerable<user> ListOfAccounts(string sortBy)
         {
-             var accounts  = sortBy == enumList.Constants.firstName.ToString() ?
-                _context.User.Include(e => e.email).Include(a => a.address).Include(p => p.phone).OrderBy(s => s.firstName) :
-                _context.User.Include(e => e.email).Include(a => a.address).Include(p => p.phone).OrderBy(s => s.lastName);
+            var accounts = sortBy == enumList.Constants.firstName.ToString() ?
+               _context.User.Include(e => e.email).Include(a => a.address).Include(p => p.phone).OrderBy(s => s.firstName) :
+               _context.User.Include(e => e.email).Include(a => a.address).Include(p => p.phone).OrderBy(s => s.lastName);
+   
             return accounts;
 
         }
@@ -80,7 +81,7 @@ namespace AddressBookAPI.Repository
 
         public List<string> AdderessList()
         {
-            var listOfAddresses = new List<string>();
+            List<string> listOfAddresses = new List<string>();
             foreach (var item in _context.Address)
             {
                 var addressObj = new addressDTO

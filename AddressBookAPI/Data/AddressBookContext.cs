@@ -11,6 +11,10 @@ namespace AddressBookAPI.Data
 {
     public class AddressBookContext : DbContext
     {
+        public AddressBookContext()
+        {
+        }
+
         public AddressBookContext(DbContextOptions<AddressBookContext> options) : base(options)
         {
 
@@ -49,9 +53,8 @@ namespace AddressBookAPI.Data
                 var refObj = new refTerm { Id = Guid.Parse(row[0].ToString()), key = row[1].ToString(), description = row[2].ToString() };
                 list.Add(refObj);
             }
-
             modelBuilder.Entity<refTerm>()
-        .HasData(list);
+            .HasData(list);
         }
 
 

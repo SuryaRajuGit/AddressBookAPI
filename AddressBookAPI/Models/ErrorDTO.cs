@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class validationErrorDTO
+    public class ErrorDTO
     {
         public string type { get; set; }
 

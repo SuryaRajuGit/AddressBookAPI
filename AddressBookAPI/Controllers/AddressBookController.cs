@@ -25,7 +25,6 @@ namespace AddressBookAPI.Controllers
     public class AddressBookController : ControllerBase
     {
         private readonly IAddressBookServices _addressBookServices;
-
         public AddressBookController(IAddressBookServices addressBookServices)
         {
             _addressBookServices = addressBookServices; 
@@ -35,70 +34,43 @@ namespace AddressBookAPI.Controllers
         [Route("account")]
         public async Task<IActionResult> AddNewAddressBook([FromBody]userDTO userModel)
         {
-            string isValidEmail = _addressBookServices.ValidateEmail(userModel);
-            if (isValidEmail != null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new validationErrorDTO { type = "Email", description = "Invalid Email "+isValidEmail });
+                return BadRequest(new ErrorDTO { type = ModelState.Keys.FirstOrDefault(),
+                    description = ModelState.Values.Select(s => s.Errors.Select(s => s.ErrorMessage).FirstOrDefault() ).FirstOrDefault() }) ;
             }
 
-            string isValidPhone = _addressBookServices.ValidatePhone(userModel);
-            if(isValidPhone != null)
-            {
-                return BadRequest(new validationErrorDTO { type = "Phone", description = "Invalid Phone Number : " + isValidPhone });
-            }
+            ErrorDTO response = await _addressBookServices.AddNewAddressBook(userModel);
 
-            Tuple<string,string> response = await _addressBookServices.AddNewAddressBook(userModel);
-     
-            switch (response.Item1)
+            if(response != null)
             {
-                case string value when value == enumList.Constants.email.ToString():
-                    return StatusCode(409, "Email Already Exists " + response.Item2);
-                    break;
-                case string value when value == enumList.Constants.address.ToString():
-                    return StatusCode(409, "Address Already Exists \n"+response.Item2);
-                    break;
-                case string value when value == enumList.Constants.phone.ToString():
-                    return StatusCode(409, "phone number already Exists " + response.Item2);
-                    break;
-                case string value when value == string.Empty:
-                    return NotFound();
-                    break;
-                default:
-                    Guid id = Guid.Parse(response.Item1);
-                    return StatusCode(201, id);
-                    break;
+                return StatusCode(409, response);
             }
+            var savetoDb = await _addressBookServices.saveToDatabase(userModel);
+            if(savetoDb == null)
+            {
+                return NotFound(); 
+            }
+            return StatusCode(201, savetoDb);
+            
+            
         }
 
         [HttpPost]
         [Route("sinup")]
         public async Task<ActionResult> SinUpAdmin([FromBody] signupDTO sinupModel)
         {
-            string isValid = _addressBookServices.PasswordValidations(sinupModel);
-
-            switch (isValid)
+           if(!ModelState.IsValid)
             {
-                case string value when value == enumList.Constants.upperCase.ToString():
-                    return BadRequest(new validationErrorDTO { type = "Upper case Exception", description = "One Uppercase Required" });
-                    break;
-                case string value when value == enumList.Constants.space.ToString():
-                    return BadRequest(new validationErrorDTO { description = "Do not Contain spaces" });
-                    break;
-                case string value when value == enumList.Constants.length.ToString():
-                    return BadRequest(new validationErrorDTO { description = "Length of password shoud be minimum 6" });
-                    break;
-                case string value when value == enumList.Constants.specialCharacter.ToString():
-                    return BadRequest(new validationErrorDTO { description = "shouild conatain atleast one special character" });
-                    break;
+                return  BadRequest(new ErrorDTO { type = ModelState.Keys.FirstOrDefault(), description = ModelState.Values.Select(s => s.Errors.Select(s => s.ErrorMessage).FirstOrDefault()).FirstOrDefault() });
             }
+
             var response = _addressBookServices.SignupAdmin(sinupModel);
             if (response != null)
             {
                 return Ok(response);
             }
             return StatusCode(409, "username already exists");
-
-
         }
 
 
@@ -112,7 +84,6 @@ namespace AddressBookAPI.Controllers
                 return NotFound();
             }
             return Ok();
-         
         }
 
         [HttpPut]
@@ -143,9 +114,9 @@ namespace AddressBookAPI.Controllers
 
         [HttpGet]
         [Route("account")]
-        public async Task<ActionResult<List<userDTO>>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder)
+        public async Task<ActionResult<List<userDTO>>> GetAllAddressBooksAccounts(int size, string pageNo, string sortBy, string sortOrder)
         {
-             var response = await _addressBookServices.GetAllAddressBooks(size,pageNo,sortBy,sortOrder);           
+             List<userDTO> response = await _addressBookServices.GetAllAddressBooks(size,pageNo,sortBy,sortOrder);           
              if (response == null)
             {
                 return NotFound();
