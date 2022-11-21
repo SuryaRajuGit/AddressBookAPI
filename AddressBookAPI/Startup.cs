@@ -1,3 +1,4 @@
+using AddressBookAPI.Controllers;
 using AddressBookAPI.Data;
 using AddressBookAPI.Models;
 using AddressBookAPI.Repository;
@@ -34,8 +35,8 @@ namespace AddressBookAPI
 
         public void ConfigureServices(IServiceCollection services)
         {
-
-
+           
+            services.AddSwaggerGen();
             services.AddAuthentication(option =>
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -44,18 +45,17 @@ namespace AddressBookAPI
                 .AddJwtBearer(option =>
                 {
                     option.SaveToken = true;
-                   
                     option.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         ValidAudience = Configuration["Jwt:ValidAudience"],
                         ValidIssuer = Configuration["Jwt:ValidIssuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"])),
-                        
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"])),                        
                         ValidateIssuer =false,
                         ValidateAudience = false,
                     };
                 });
+            services.AddAutoMapper(typeof(Startup));
             services.AddDbContext<AddressBookContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AddressBookDB")));
             services.AddControllers();
             services.AddTransient<IAddressBookRepository, AddressBookRepository>();
@@ -65,11 +65,15 @@ namespace AddressBookAPI
                 options.SuppressModelStateInvalidFilter = true;
             });
 
+            var serviceProvider = services.BuildServiceProvider();
+            var logger = serviceProvider.GetService<ILogger<AddressBookController>>();
+            services.AddSingleton(typeof(ILogger), logger);
+
             services.AddControllersWithViews()
             .AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
-            services.AddAutoMapper(typeof(Startup));
+            
             }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -78,12 +82,12 @@ namespace AddressBookAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+      
+            app.UseSwagger();
+            app.UseSwaggerUI();
             app.UseRouting();
-
             app.UseAuthorization();
             app.UseAuthentication();
-            
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

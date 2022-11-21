@@ -1,6 +1,10 @@
 ﻿using AddressBookAPI.Data;
+using AddressBookAPI.Helpers;
 using AddressBookAPI.Models;
 using AddressBookAPI.Repository;
+using AutoMapper;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -10,36 +14,38 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace AddressBookAPI.Services
 {
     public class AddressBookServices : IAddressBookServices
     {
-
+        private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IAddressBookRepository _addressBookRepository;
-
+        private readonly IServer _server;
         byte[] key = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
         byte[] iv = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
- 
- 
-
-        public AddressBookServices(IConfiguration configuration, IAddressBookRepository addressBookRepository)
-        {
-
+        public AddressBookServices(IConfiguration configuration, IAddressBookRepository addressBookRepository, IServer server, IMapper mapper)
+        { 
             _configuration = configuration;
             _addressBookRepository = addressBookRepository;
+            _server = server;
+             _mapper = mapper;
         }
 
-public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
+        // verifies user login details and returns logInResponseDTO Dto
+        public logInResponseDTO VerifyUser(LogInDTO logInDTO)
         {
-
-            string userPassword = _addressBookRepository.loginDetails(logInModel.userName);
+            //takes Args login userName string,returns string ,checks the userName exists in the database
+            string userPassword = _addressBookRepository.loginDetails(logInDTO.userName);
             if (userPassword == null)
             {
                 return null;
@@ -53,17 +59,17 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
             string password = Encoding.Unicode.GetString(outputBuffer);
 
 
-            if (password == logInModel.Password)
+            if (password == logInDTO.Password)
             {
                 JwtSecurityTokenHandler tokenhandler = new JwtSecurityTokenHandler();
-                byte[] tokenKey = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]);
+                byte[] tokenKey = Encoding.UTF8.GetBytes("thisismySecureKey12345678");
 
                 SecurityTokenDescriptor tokenDeprictor = new SecurityTokenDescriptor
                 {
                     Subject = new System.Security.Claims.ClaimsIdentity(
                         new Claim[]
                         {
-                            new Claim(ClaimTypes.Name, logInModel.userName) }
+                            new Claim(ClaimTypes.Name, logInDTO.userName) }
                         ),
                     Expires = DateTime.UtcNow.AddMinutes(30),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
@@ -81,39 +87,40 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
             return null;
 
         }
-        public async Task<List<userDTO>> GetAllAddressBooks(int size, string pageNo, string sortBy, string sortOrder)
+
+        //returns all AddressBooks from database
+        public List<UserDTO> GetAllAddressBooks(int size, int pageNo, string sortBy, string sortOrder)
         {
-            IEnumerable<user> accounts = _addressBookRepository.ListOfAccounts(sortBy);
-            if (accounts == null)
+            // takes Args size Int,pageNo Int ,returns list of AddressBooks after applying pagenation
+            List<user> pagenatedList = _addressBookRepository.Pagenation(size, pageNo);
+            if (pagenatedList == null)
             {
                 return null;
             }
-            int count = 0;
-            List<userDTO> accountsList = new List<userDTO>();
-            foreach (user item in accounts)
+            IEnumerable<user> sortList = sortBy == "firstName" ? pagenatedList.OrderBy(s => s.firstName) : pagenatedList.OrderBy(s => s.lastName);
+            if (sortOrder == "DSC")
             {
-                userDTO user = AddressBookMaping(item);
+                sortList = sortBy == "firstName" ? sortList.OrderByDescending(s => s.firstName) : sortList.OrderByDescending(s => s.lastName);
+            }
+           
+            List<UserDTO> accountsList = new List<UserDTO>();
+            foreach (user item in sortList)
+            {
+                UserDTO user = _mapper.Map<UserDTO>(item); //AddressBookMaping(item);
                 accountsList.Add(user);
-                count = count + 1;
-                if (size == count)
-                {
-                    break;
-                }
+               
             };
             return accountsList;
         }
 
-        public async Task<Guid?> UpdateAddressBook(Guid id, userDTO userModel)
+        // updates existing  AddressBook based on userId
+        public void  UpdateAddressBook(Guid id, UserDTO userDTO)
         {
+            //takes Args Guid ,returns user Dto,gets addressbook from database using userId.
             user account = _addressBookRepository.GetAccountCount(id);
-            if (account == null)
-            {
-                return null;
-            }
-
-            account.firstName = userModel.firstName;
-            account.lastName = userModel.lastName;
-            account.email = userModel.Email.Select(s => new email
+            account.firstName = userDTO.firstName;
+            account.lastName = userDTO.lastName;
+            account.email = userDTO.Email.Select(s => new email
             {
                 userId = id,
                 emailAddress = s.emailAddress,
@@ -121,7 +128,7 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
             }).ToList();
 
 
-            account.address = userModel.Address.Select(s => new address
+            account.address = userDTO.Address.Select(s => new address
             {
                 refTermId = s.type.key,
                 line1 = s.line1,
@@ -132,65 +139,70 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
                 country = s.type.key,
                 userId = id,
             }).ToList();
-            account.phone = userModel.Phone.Select(s =>
+            account.phone = userDTO.Phone.Select(s =>
                 new phone
                 {
                     refTermId = s.type.key,
                     phoneNumber = s.phoneNumber
                 }).ToList().ToList();
-            _addressBookRepository.UpdateToDataBase(account);
-            return id;
 
+            //Saves Updated AddressBook into database
+            _addressBookRepository.UpdateToDataBase(account);
         }
+
+        // Gets count of AddressBooks from database
         public int GetAddressBookCount()
         {
             return _addressBookRepository.GetAddressBookCount();
         }
-        public async Task<ErrorDTO> AddNewAddressBook(userDTO UserModel)
+
+        // Checks email exists in the database and return string 
+        public string EmailExists(ICollection<EmailDTO> email)
         {
-
-            List<string> emailList = _addressBookRepository.EmailList();
-            List<string> phoneList = _addressBookRepository.PhoneList();
-
-            foreach (var email in UserModel.Email)
+            // takes Args email ICollection<EmailDTO> ,returns string ,checks emails exist in the database
+            string isEmailExists = _addressBookRepository.EmailList(email);
+            if(isEmailExists != null)
             {
-                if (emailList.Contains(email.emailAddress))
-                {
-                    return new ErrorDTO {type = enumList.Constants.email.ToString(),description=email.emailAddress +" Already exists" }; //Tuple.Create(enumList.Constants.email.ToString(),email.emailAddress);
-                }
-            }
-            foreach (var phone in UserModel.Phone)
-            {
-                if (phoneList.Contains(phone.phoneNumber))
-                {
-                    return new ErrorDTO { type = enumList.Constants.phone.ToString(),
-                        description = phone.phoneNumber + " Already exists" };//Tuple.Create(enumList.Constants.phone.ToString(), phone.phoneNumber);
-
-                }
-            }
-            List<string> addressList = _addressBookRepository.AdderessList();
-            foreach (var item in UserModel.Address)
-            {
-                string jsonobj = JsonConvert.SerializeObject(item);
-                if (addressList.Contains(jsonobj))
-                {
-                    return new ErrorDTO { type = enumList.Constants.address.ToString(),
-                        description = " Already exists "+ jsonobj };//Tuple.Create(enumList.Constants.address.ToString(), jsonobj);
-                }
+                return isEmailExists;
             }
             return null;
         }
-        public async Task<Guid?> saveToDatabase(userDTO UserModel)
-        {
-            var newId = Guid.NewGuid();
 
-            var userModel = new user()
+        // Checks phone no exists in the database and return string
+        public string PhoneExists(ICollection<PhoneDTO> phone)
+        {
+            // takes Args phone ICollection<PhoneDTO> ,returns string ,checks phone no exist in the database
+            string isPhoneExists = _addressBookRepository.PhoneList(phone);
+            if (isPhoneExists != null)
+            {
+                return isPhoneExists;
+            }
+            return null;
+        }
+        // Checks address exists in the database and return string
+        public string AddressExists(ICollection<AddressDTO> addresses)
+        {
+            // takes Args Address ICollection<AddressDTO> ,returns string ,checks Address exist in the database
+            string isPhoneExists = _addressBookRepository.AdderessList(addresses);
+            if (isPhoneExists != null)
+            {
+                return isPhoneExists;
+            }
+            return null;
+        }
+
+        // Saves new AddressBook into database 
+        public  Guid? saveToDatabase(UserDTO userDTO)
+        {
+            Guid newId = Guid.NewGuid();
+
+            user user = new user()
             {
                 Id = newId,
-                firstName = UserModel.firstName,
-                lastName = UserModel.lastName,
+                firstName = userDTO.firstName,
+                lastName = userDTO.lastName,
 
-                email = UserModel.Email.Select(s =>
+                email = userDTO.Email.Select(s =>
                    new email
                    {
                        emailAddress = s.emailAddress,
@@ -198,7 +210,7 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
                        refTermId = s.type.key,
                    }).ToList(),
 
-                address = UserModel.Address.Select(s =>
+                address = userDTO.Address.Select(s =>
                 new address
                 {
                     line1 = s.line1,
@@ -211,7 +223,7 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
                     zipCode = s.zipCode
                 }).ToList(),
 
-                phone = UserModel.Phone.Select(s =>
+                phone = userDTO.Phone.Select(s =>
                 new phone
                 {
                     refTermId = s.type.key,
@@ -219,32 +231,35 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
                     phoneNumber = s.phoneNumber
                 }).ToList()
             };
-
             try
             {
-                _addressBookRepository.SaveToDataBase(userModel);
-                return newId;
+                // saves new addressBook into database
+                _addressBookRepository.SaveToDataBase(user);
             }
             catch
             {
                 return null;
             }
-            return null;
+            return newId;
+            
         }
 
-        public async Task<Guid?> DeletAddressBook(Guid id)
+        //Deletes AddressBook from database
+        public string  DeletAddressBook(Guid id)
         {
-
+            //takes Args id Guid ,returns user Dto,checks the addressbook exists in the database
             user account = _addressBookRepository.GetAccountCount(id);
             if (account == null)
             {
                 return null;
             }
+            //takes account Dto,removes the addressBook from database
             _addressBookRepository.RemoveAccount(account);
-            return id;
+            return "";
         }
 
-        public async Task<UploadResponseDTO> UploadFile(IFormFile file)
+        //uploads file into database in form of bytes
+        public UploadResponseDTO UploadFile(IFormFile file)
         {
             MemoryStream ms = new MemoryStream();
             file.CopyTo(ms);
@@ -254,22 +269,26 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
                 Id = Guid.NewGuid(),
                 field = bytes,
             };
-
+            string addresses = _server.Features.Get<IServerAddressesFeature>().Addresses.FirstOrDefault();
             UploadResponseDTO response = new UploadResponseDTO
             {
                 Id = fileObj.Id,
                 fileName = file.FileName,
-                downloadURL = "http://localhost:6162/api/asset/downloadFile/" + fileObj.Id,
+                downloadURL = addresses + "api/asset/downloadFile/" + fileObj.Id, 
                 fileType = file.ContentType,
                 size = file.Length,
                 fileContent = null
             };
+            // takes fileObj Model ,saves into database
             _addressBookRepository.SaveFileToDataBase(fileObj);
 
             return response;
         }
+
+        // Downloads file file from database
         public byte[] Download(Guid id)
         {
+            //takes Args id Guid,returns bytes[] ,gets file byte[] from database using Guid.
             byte[] bytes = _addressBookRepository.GetFile(id);
             if (bytes == null)
             {
@@ -277,59 +296,26 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
             }
             return bytes;
         }
-
-        public async Task<userDTO> GetAddressBook(Guid id)
+        // returns AddressBook from database using id
+        public UserDTO GetAddressBook(Guid id)
         {
-            user account = await _addressBookRepository.GetAddressBook(id);
+            // takes Args id Guid ,returns user Model ,gets user model from database using id.
+            user account =  _addressBookRepository.GetAddressBook(id);
             if (account == null)
             {
                 return null;
             }
-            userDTO response = AddressBookMaping(account);
-            return response;
+                UserDTO addressBook = _mapper.Map<UserDTO>(account)   ;
+          
+            return addressBook;
         }
 
-        public userDTO AddressBookMaping(user user)
+        // saves new Admin logins into database 
+        public int? SignupAdmin(SignupDTO signupDTO)
         {
-            userDTO users =
-                new userDTO()
-                {
-                    Id = user.Id,
-                    firstName = user.firstName,
-                    lastName = user.lastName,
-                    Email = user.email.Select(s =>
-                      new emailDTO
-                      {
-                          emailAddress = s.emailAddress,
-                          type = new typeDTO { key = s.refTermId }
-                      }).ToList(),
-
-                    Address = user.address.Select(s =>
-                      new addressDTO
-                      {
-                          line1 = s.line1,
-                          line2 = s.line2,
-                          type = new typeDTO { key = s.refTermId },
-                          stateName = s.stateName,
-                          city = s.city,
-                          country = new typeDTO { key = s.refTermId },
-                          zipCode = s.zipCode
-                      }).ToList(),
-
-                    Phone = user.phone.Select(s =>
-                      new phoneDTO
-                      {
-                          type = new typeDTO { key = s.refTermId },
-                          phoneNumber = s.phoneNumber
-                      }).ToList()
-                };
-            return users;
-        }
-
-        public async Task<int?> SignupAdmin(signupDTO signupModel)
-        {
-            string text = signupModel.password;
-            bool isExists = _addressBookRepository.isUserNameExists(signupModel.userName);
+            string text = signupDTO.password;
+            // takes Args new login userName string ,return bool ,checks username exists in database
+            bool isExists = _addressBookRepository.isUserNameExists(signupDTO.userName);
             if (isExists)
             {
                 return null;
@@ -339,7 +325,7 @@ public async Task<logInResponseDTO> VerifyUser(logInDTO logInModel)
             byte[] inputbuffer = Encoding.Unicode.GetBytes(text);
             byte[] outputBuffer = transform.TransformFinalBlock(inputbuffer, 0, inputbuffer.Length);
             string password = Convert.ToBase64String(outputBuffer);
-            Login loginObj = new Login { userName = signupModel.userName, password = password };
+            login loginObj = new login { userName = signupDTO.userName, password = password };
             return _addressBookRepository.SinupAdmin(loginObj);
 
         }

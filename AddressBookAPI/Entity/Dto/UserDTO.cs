@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AddressBookAPI.Models
 {
     
-    public  class userDTO 
+    public  class UserDTO 
     {
         public Guid Id { get; set; }
 
@@ -18,13 +18,13 @@ namespace AddressBookAPI.Models
         [Required]
         public string lastName { get; set; }
 
-        public ICollection<addressDTO> Address { get; set; }
+        public ICollection<AddressDTO> Address { get; set; }
 
-        public ICollection<assetDTO> AssetDTO { get; set; }
+        public ICollection<AssetDTO> AssetDTO { get; set; }
 
-        public ICollection<emailDTO> Email { get; set; }
+        public ICollection<EmailDTO> Email { get; set; }
 
-        public ICollection<phoneDTO> Phone { get; set; }
+        public ICollection<PhoneDTO> Phone { get; set; }
 
         
 

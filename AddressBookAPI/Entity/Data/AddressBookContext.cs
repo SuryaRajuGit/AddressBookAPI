@@ -36,14 +36,14 @@ namespace AddressBookAPI.Data
 
         public DbSet<user> User { get; set; }
 
-        public DbSet<Login> Login { get; set; }
+        public DbSet<login> Login { get; set; }
 
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Migrations\SeedingDataFromCSV\Book1.csv";
+            string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\SeedingDataFromCSV\Book1.csv";
             string ReadCSV = File.ReadAllText(path);
             var data = ReadCSV.Split('\r');
             var list = new List<refTerm>();

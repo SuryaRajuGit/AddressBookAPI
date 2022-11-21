@@ -23,11 +23,12 @@ namespace AddressBookAPI.Repository
 
         public int GetAddressBookCount();
 
-        public List<string> EmailList();
+        public string EmailList(ICollection<EmailDTO> email);
 
-        public List<string> PhoneList();
 
-        public List<string> AdderessList();
+        public string PhoneList(ICollection<PhoneDTO> phone);
+
+        public string AdderessList(ICollection<AddressDTO> address);
 
         public void  RemoveAccount(user account);
 
@@ -37,11 +38,13 @@ namespace AddressBookAPI.Repository
 
         public byte[] GetFile(Guid id);
 
-        public Task<user> GetAddressBook(Guid id);
+        public user GetAddressBook(Guid id);
 
-        public int SinupAdmin(Login sinupModel);
+        public int SinupAdmin(login sinupModel);
 
         public bool isUserNameExists(string text);
+
+        public List<user> Pagenation(int size,int pageNo);
 
 
     }

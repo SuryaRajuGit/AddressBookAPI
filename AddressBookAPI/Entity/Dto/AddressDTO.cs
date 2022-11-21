@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class addressDTO
+    public class AddressDTO
     {
         [Required]
         public string line1 { get; set; }
@@ -24,10 +24,10 @@ namespace AddressBookAPI.Models
         public string stateName { get; set; }
 
         [Required]
-        public typeDTO country { get; set; }
+        public TypeDTO country { get; set; }
 
         [Required]
-        public typeDTO type { get; set; }
+        public TypeDTO type { get; set; }
 
     }
 }

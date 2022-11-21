@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Data
 {
-    public class Login
+    public class login
     {
         public int Id { get; set; }
 

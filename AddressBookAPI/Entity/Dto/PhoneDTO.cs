@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace AddressBookAPI.Models
 {
-    public class phoneDTO
+    public class PhoneDTO
     {
         //[DataType(DataType.PhoneNumber)]
         //[RegularExpression(@"^\\(?(\[0-9\]{3})\\)?\[-.●\]?(\[0-9\]{3})\[-.●\]?(\[0-9\]{4})$", ErrorMessage = "The PhoneNumber field is not a valid phone number")]
@@ -18,6 +18,6 @@ namespace AddressBookAPI.Models
         public string phoneNumber { get; set; }
 
         [Required]
-        public typeDTO type { get; set; }
+        public TypeDTO type { get; set; }
     }
 }

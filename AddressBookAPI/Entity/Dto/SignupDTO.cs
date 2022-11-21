@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class signupDTO
+    public class SignupDTO
     {
         [Required]
         public string userName {get;set;}

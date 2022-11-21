@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Models
 {
-    public class assetDTO
+    public class AssetDTO
     {
         public Guid Id { get; set; }
 
