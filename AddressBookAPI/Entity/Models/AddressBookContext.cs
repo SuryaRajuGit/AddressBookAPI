@@ -1,4 +1,4 @@
-﻿using AddressBookAPI.Models;
+﻿
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AddressBookAPI.Data
+namespace AddressBookAPI.Entity.Models
 {
     public class AddressBookContext : DbContext
     {
@@ -43,7 +43,7 @@ namespace AddressBookAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\SeedingDataFromCSV\Book1.csv";
+            string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\Book1.csv";
             string ReadCSV = File.ReadAllText(path);
             var data = ReadCSV.Split('\r');
             var list = new List<refTerm>();

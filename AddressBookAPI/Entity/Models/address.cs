@@ -5,11 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AddressBookAPI.Data
+namespace AddressBookAPI.Entity.Models
 {
     public class address
     {
-     
         public int Id { get; set; }
 
         public string line1 { get; set; }
@@ -20,7 +19,7 @@ namespace AddressBookAPI.Data
 
         public string zipCode { get; set; }
 
-        public string stateName { get; set; }
+        public string state_name { get; set; }
 
         public Guid country { get; set; }
 

@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Entity.Dto
 {
-    public class ErrorDTO
+    public class bookDto
     {
-        public string type { get; set; }
-
-        public string description { get; set; }
+        public string key { get; set; }
     }
 }

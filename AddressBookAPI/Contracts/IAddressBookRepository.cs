@@ -1,5 +1,6 @@
-﻿using AddressBookAPI.Data;
-using AddressBookAPI.Models;
+﻿
+using AddressBookAPI.Entity.Dto;
+using AddressBookAPI.Entity.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,15 @@ namespace AddressBookAPI.Repository
 {
     public  interface IAddressBookRepository
     {
+        public string GetType(Guid item);
+
+    
+
         public string loginDetails(string userName );
 
-        public IEnumerable<user> ListOfAccounts(string sortBy);
+    //    public IEnumerable<user> ListOfAccounts(string sortBy);
 
-        public user GetAccountCount(Guid id);
+        public user GetAccount(Guid id, UserDTO userDTO);
 
         public void UpdateToDataBase(user account);
 
@@ -32,15 +37,17 @@ namespace AddressBookAPI.Repository
 
         public void  RemoveAccount(user account);
 
+        public user GetAddressbook(Guid id);
+
         public void SaveToDataBase(user account);
 
         public void SaveFileToDataBase(asset fileObj);
 
         public byte[] GetFile(Guid id);
 
-        public user GetAddressBook(Guid id);
+   //     public user GetAddressBook(Guid id, UserDTO userDTO);
 
-        public int SinupAdmin(login sinupModel);
+        public void SinupAdmin(login sinupModel);
 
         public bool isUserNameExists(string text);
 

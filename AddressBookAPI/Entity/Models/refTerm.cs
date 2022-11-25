@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AddressBookAPI.Data
+namespace AddressBookAPI.Entity.Models
 {
     public class refTerm
     {

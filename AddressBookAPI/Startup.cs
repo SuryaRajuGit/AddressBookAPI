@@ -1,6 +1,5 @@
 using AddressBookAPI.Controllers;
-using AddressBookAPI.Data;
-using AddressBookAPI.Models;
+using AddressBookAPI.Entity.Models;
 using AddressBookAPI.Repository;
 using AddressBookAPI.Services;
 using AutoMapper;
@@ -15,9 +14,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,8 +37,8 @@ namespace AddressBookAPI
 
         public void ConfigureServices(IServiceCollection services)
         {
-           
-            services.AddSwaggerGen();
+
+
             services.AddAuthentication(option =>
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,8 +52,8 @@ namespace AddressBookAPI
                         ValidateIssuerSigningKey = true,
                         ValidAudience = Configuration["Jwt:ValidAudience"],
                         ValidIssuer = Configuration["Jwt:ValidIssuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"])),                        
-                        ValidateIssuer =false,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"])),
+                        ValidateIssuer = false,
                         ValidateAudience = false,
                     };
                 });
@@ -68,23 +70,35 @@ namespace AddressBookAPI
             var serviceProvider = services.BuildServiceProvider();
             var logger = serviceProvider.GetService<ILogger<AddressBookController>>();
             services.AddSingleton(typeof(ILogger), logger);
-
             services.AddControllersWithViews()
             .AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
-            
-            }
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "AddressBook",
+                    Version = "v1",
+                    Description = "Open API AddressBook",
+                });
+
+             //   var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+             //   var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+             //   c.IncludeXmlComments(xmlPath);
+            });
+        }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-      
+
             app.UseSwagger();
             app.UseSwaggerUI();
+
             app.UseRouting();
             app.UseAuthorization();
             app.UseAuthentication();

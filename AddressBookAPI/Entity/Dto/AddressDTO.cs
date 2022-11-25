@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AddressBookAPI.Models
+namespace AddressBookAPI.Entity.Dto
 {
     public class AddressDTO
     {
         [Required]
         public string line1 { get; set; }
 
-        [Required]
+     
         public string line2 { get; set; }
 
         [Required]
@@ -21,7 +21,7 @@ namespace AddressBookAPI.Models
         public string zipCode { get; set; }
 
         [Required]
-        public string stateName { get; set; }
+        public string state_name { get; set; }
 
         [Required]
         public TypeDTO country { get; set; }

@@ -4,21 +4,17 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AddressBookAPI.Models
+namespace AddressBookAPI.Entity.Dto
 {
     public class SignupDTO
     {
         [Required]
-        public string userName {get;set;}
+        public string user_name {get;set;}
 
         [Required]
-        [DataType(DataType.Password)]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 8)]
-        [Display(Name = "Password")]
-        [RegularExpression("^((?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])|(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[^a-zA-Z0-9])" +
-            "|(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[^a-zA-Z0-9])|(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^a-zA-Z0-9])).{8,}$",
-            ErrorMessage = "Passwords must be at least 8 characters and contain at 3 of 4 of the following: upper case (A-Z)," +
-            " lower case (a-z), number (0-9) and special character (e.g. !@#$%^&*)")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,15}$",
+            ErrorMessage = "Passwords must be at least 8 characters, one upper case (A-Z)," +
+            "one lower case (a-z),a number (0-9) and special character (e.g. !@#$%^&*)")]
         public string password { get; set; }
     }
 }

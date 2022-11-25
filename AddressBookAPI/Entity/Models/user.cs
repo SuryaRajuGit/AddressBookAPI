@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AddressBookAPI.Data
+namespace AddressBookAPI.Entity.Models
 {
     public class user
     {
         public Guid Id { get; set; }
 
-        public string firstName { get; set; }
+        public string first_name { get; set; }
 
-        public string lastName { get; set; }
+        public string last_name { get; set; }
 
         public ICollection<address> address { get; set; }
 

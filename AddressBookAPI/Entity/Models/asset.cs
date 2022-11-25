@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AddressBookAPI.Data
+namespace AddressBookAPI.Entity.Models
 {
     public class asset
     {

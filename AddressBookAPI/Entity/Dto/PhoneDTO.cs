@@ -5,17 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
-namespace AddressBookAPI.Models
+namespace AddressBookAPI.Entity.Dto
 {
     public class PhoneDTO
     {
         //[DataType(DataType.PhoneNumber)]
-        //[RegularExpression(@"^\\(?(\[0-9\]{3})\\)?\[-.●\]?(\[0-9\]{3})\[-.●\]?(\[0-9\]{4})$", ErrorMessage = "The PhoneNumber field is not a valid phone number")]
-        [Display(Name = "Mobile Number:")]
+        [RegularExpression(@"^[6-9]\d{9}$", ErrorMessage = "The PhoneNumber field is not a valid phone number")]
         [Required]
-        [MinLength(10)]
-        [MaxLength(10)]
-        public string phoneNumber { get; set; }
+        public string phone_number { get; set; }
 
         [Required]
         public TypeDTO type { get; set; }

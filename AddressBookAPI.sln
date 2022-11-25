@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.32929.386
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddressBookAPI", "AddressBookAPI\AddressBookAPI.csproj", "{29257E99-6AD1-418A-A7A1-A0AEB911C2CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddressBookUnitTest", "AddressBookUnitTest\AddressBookUnitTest.csproj", "{D4C89887-6C8A-4824-8342-FB2AD8193A58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddressBookUnitTest", "AddressBookUnitTest\AddressBookUnitTest.csproj", "{D4C89887-6C8A-4824-8342-FB2AD8193A58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

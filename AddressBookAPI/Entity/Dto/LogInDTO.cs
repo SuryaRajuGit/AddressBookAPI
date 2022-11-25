@@ -4,16 +4,16 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AddressBookAPI.Models
+namespace AddressBookAPI.Entity.Dto
 {
     public class LogInDTO
     {
-        public int Id { get; set; }
+      
 
         [Required]
-        public string userName { get; set; }
+        public string user_name { get; set; }
 
         [Required]
-        public string Password { get; set; }
+        public string password { get; set; }
     }
 }

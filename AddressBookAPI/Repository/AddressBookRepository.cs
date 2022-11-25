@@ -1,5 +1,4 @@
-﻿using AddressBookAPI.Data;
-using AddressBookAPI.Models;
+﻿
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +18,8 @@ using AddressBookAPI.Services;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
 using CsvHelper;
+using AddressBookAPI.Entity.Dto;
+using AddressBookAPI.Entity.Models;
 
 namespace AddressBookAPI.Repository
 {
@@ -33,13 +34,13 @@ namespace AddressBookAPI.Repository
         //takes Args username string ,returns string ,checks username exists in database
         public string loginDetails(string userName)
         {
-            return _context.Login.Where(s => s.userName == userName).Select(s => s.password).FirstOrDefault();
+            return _context.Login.Where(s => s.user_name == userName).Select(s => s.password).FirstOrDefault();
             
         }
         //takes Args username string ,returns bool ,checks username exists in database
         public bool isUserNameExists(string text)
         {
-            List<string> listOfAdmins =  _context.Login.Select(s => s.userName).ToList();
+            List<string> listOfAdmins =  _context.Login.Select(s => s.user_name).ToList();
             return listOfAdmins.Contains(text);
         }
 
@@ -54,19 +55,9 @@ namespace AddressBookAPI.Repository
             return listOfUsers;
         }
 
-        //takes Args sortBy string,returns IEnumerable<user> ,gets all AddressBooks sorted by  firstname or lastname
-        public IEnumerable<user> ListOfAccounts(string sortBy)
+        public user GetAccount(Guid id, UserDTO userDTO)
         {
-            IEnumerable<user> accounts = sortBy == enumList.Constants.firstName.ToString() ?
-               _context.User.Include(e => e.email).Include(a => a.address).Include(p => p.phone).OrderBy(s => s.firstName) :
-               _context.User.Include(e => e.email).Include(a => a.address).Include(p => p.phone).OrderBy(s => s.lastName);
-           
-            return accounts;
 
-        }
-        // returns user Model  
-        public user GetAccountCount(Guid id)
-        {
             return  _context.User.Include(e => e.email).Include(p => p.phone).Include(a => a.address).FirstOrDefault(s => s.Id == id);
         }
 
@@ -77,6 +68,12 @@ namespace AddressBookAPI.Repository
             _context.SaveChanges();
         }
 
+        public user GetAddressbook(Guid id)
+        {
+            return _context.User.Include(s => s.email).Include(a => a.address).Include(p => p.phone).FirstOrDefault(s => s.Id == id);
+        }
+
+
         // returns count of addressBook count
         public int GetAddressBookCount()
         {
@@ -86,9 +83,9 @@ namespace AddressBookAPI.Repository
         //  takes Args as Email and checks in database ,returns string 
         public string EmailList(ICollection<EmailDTO> email)
         {
-            foreach (string item in email.Select(s => s.emailAddress))
+            foreach (string item in email.Select(s => s.email_address))
             {
-                email userEmail = _context.Email.Where(w => w.emailAddress == item).FirstOrDefault();
+                email userEmail = _context.Email.Where(w => w.email_address == item).FirstOrDefault();
                 if(userEmail != null)
                 {
                     return item;
@@ -100,9 +97,9 @@ namespace AddressBookAPI.Repository
         //  takes Args as Phone and checks in database ,returns string
         public string PhoneList(ICollection<PhoneDTO> phone)
         {
-            foreach (string item in phone.Select(s => s.phoneNumber))
+            foreach (string item in phone.Select(s => s.phone_number))
             {
-                phone userPhone = _context.Phone.Where(w => w.phoneNumber == item).FirstOrDefault();
+                phone userPhone = _context.Phone.Where(w => w.phone_number == item).FirstOrDefault();
                 if (userPhone != null)
                 {
                     return item;
@@ -125,9 +122,9 @@ namespace AddressBookAPI.Repository
                         line2 = i.line2,
                         city = i.city,
                         zipCode = i.zipCode,
-                        stateName = i.stateName,
-                        type = new TypeDTO { key = i.refTermId },
-                        country = new TypeDTO { key = i.refTermId },
+                        state_name = i.state_name,
+                        type = new TypeDTO { key = (i.refTermId).ToString() },
+                        country = new TypeDTO { key = (i.refTermId).ToString() },
                     };
                     string josnObj = JsonConvert.SerializeObject(addressObj);
                     if (josnObj == josnObjj)
@@ -142,8 +139,9 @@ namespace AddressBookAPI.Repository
         //Delets addressBook from database
         public void RemoveAccount(user account)
         {
+          
              _context.Remove(account);
-             _context.SaveChangesAsync();
+             _context.SaveChanges();
         }
 
         //saves AdderssBoook to database
@@ -159,25 +157,23 @@ namespace AddressBookAPI.Repository
             _context.SaveChanges();       
         }
 
+        public string GetType(Guid id)
+        {
+            return _context.RefTerm.Where(w => w.Id ==id).Select(s => s.key).FirstOrDefault();
+          
+        }
+
         //returns file converitng into byte[] 
         public byte[] GetFile(Guid id)
         {
             return _context.AssetDTO.Where(f => f.Id == id).Select(s => s.field).FirstOrDefault();
         }
 
-        // returns user Model ,using Id.
-        public user GetAddressBook(Guid id)
-        {
-            return  _context.User.Include(e => e.email).Include(a => a.address).Include(p => p.phone).Where(f => f.Id == id).FirstOrDefault();
-            
-        }
-
         //saves new Admin login details into database
-        public int SinupAdmin(login sinupModel)
+        public void SinupAdmin(login sinupModel)
         {
              _context.Add(sinupModel);
-            _context.SaveChanges();
-            return  _context.Login.Where(w => w.userName == sinupModel.userName).Select(s => s.Id).FirstOrDefault();
+            _context.SaveChanges();   
         }
     }
 }

@@ -5,16 +5,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AddressBookAPI.Data
+namespace AddressBookAPI.Entity.Models
 {
-    public class phone
+    public class setRefTerm
     {
-        public int Id { get; set; }
+        [Key]
+        public Guid Id { get; set; }
 
-        public string phoneNumber { get; set; }
+        public Guid refSetId { get; set; }
+        public refSet refSet { get; set; }
 
-        public Guid userId { get; set; }
-        public user user { get; set; }
 
         public Guid refTermId { get; set; }
         public refTerm refTerm { get; set; }

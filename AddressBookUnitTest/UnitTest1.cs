@@ -1,8 +1,9 @@
 using AddressBookAPI;
 using AddressBookAPI.Controllers;
-using AddressBookAPI.Data;
+
+using AddressBookAPI.Entity.Dto;
+using AddressBookAPI.Entity.Models;
 using AddressBookAPI.Helpers;
-using AddressBookAPI.Models;
 using AddressBookAPI.Repository;
 using AddressBookAPI.Services;
 using AutoMapper;
@@ -40,7 +41,7 @@ namespace AddressBookUnitTest
         private readonly ILogger _logger;
         public UnitTest1()
         {
-            var hostBuilder = Host.CreateDefaultBuilder().
+            IHostBuilder hostBuilder = Host.CreateDefaultBuilder().
             ConfigureLogging((builderContext, loggingBuilder) =>
             {
                 loggingBuilder.AddConsole((options) =>
@@ -48,10 +49,10 @@ namespace AddressBookUnitTest
                     options.IncludeScopes = true;
                 });
             });
-            var host = hostBuilder.Build();
-            var _logger = host.Services.GetRequiredService<ILogger<AddressBookController>>();
+            IHost host = hostBuilder.Build();
+            ILogger<AddressBookController> _logger = host.Services.GetRequiredService<ILogger<AddressBookController>>();
 
-            var mappingConfig = new MapperConfiguration(mc =>
+            MapperConfiguration mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new ApplicationMapper());
             });
@@ -59,7 +60,7 @@ namespace AddressBookUnitTest
             IMapper mapper = mappingConfig.CreateMapper();
             _mapper = mapper;
 
-            var options = new DbContextOptionsBuilder<AddressBookContext>()
+            DbContextOptions<AddressBookContext> options = new DbContextOptionsBuilder<AddressBookContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
             _context = new AddressBookContext(options);
             addData();
@@ -67,8 +68,6 @@ namespace AddressBookUnitTest
             _repository = new AddressBookRepository(_context);
             _addressBookServices = new AddressBookServices(_configuration, _repository, _server, _mapper);
             _addresBookController = new AddressBookController(_addressBookServices, _logger);
-
-
         }
         public void addData()
         {
@@ -77,13 +76,13 @@ namespace AddressBookUnitTest
             new user()
             {
                 Id = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                firstName = "abc",
-                lastName = "xyz",
+                first_name = "abc",
+                last_name = "xyz",
 
                 email = new List<email>() {
                 new email
                    {
-                       emailAddress = "abc@gmail.com",
+                       email_address = "abc@gmail.com",
                        userId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
                        refTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
                    }, },
@@ -95,7 +94,7 @@ namespace AddressBookUnitTest
                     country = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
                     userId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
                     refTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                    stateName = "stateName",
+                    state_name = "stateName",
                     city = "city",
                     zipCode ="zipCode"
                 },},
@@ -105,33 +104,33 @@ namespace AddressBookUnitTest
                 {
                     refTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
                     userId =Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9") ,
-                    phoneNumber = "8152233879"
+                    phone_number = "8152233879"
                 },new phone
                 {
                     refTermId = Guid.Parse("F87B8232-F2D8-4286-AC13-422AA54194CE"),
                     userId =Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9") ,
-                    phoneNumber = "8122233879"
+                    phone_number = "8122233879"
                 } }
 
         },new user()
             {
                 Id = Guid.Parse("E1E91040-8C5E-4748-A625-2E493C7818D9"),
-                firstName = "def",
-                lastName = "jkh",
+                first_name = "def",
+                last_name = "jkh",
 
                 email = new List<email>() {
                 new email
                    {
-                       emailAddress = "xyz@gmail.com",
+                       email_address = "xyz@gmail.com",
                        userId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
                        refTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                   }, },
-                //new email
-                //   {
-                //       emailAddress = "abc@gmail.com",
-                //       userId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                //       refTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                //   } },
+                   }, 
+                new email
+                   {
+                       email_address = "abc@gmail.com",
+                       userId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
+                       refTermId = Guid.Parse("04CD138D-6CE7-4389-919C-6687CF7F011F"),
+                   } },
 
                 address = new List<address>() {
                 new address
@@ -141,7 +140,7 @@ namespace AddressBookUnitTest
                     country = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
                     userId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
                     refTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                    stateName = "stateName",
+                    state_name = "stateName",
                     city = "city",
                     zipCode ="zipCode"
                 },},
@@ -151,23 +150,23 @@ namespace AddressBookUnitTest
                 {
                     refTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
                     userId =Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9") ,
-                    phoneNumber = "9152233879"
+                    phone_number = "9152233879"
                 },new phone
                 {
                     refTermId = Guid.Parse("F87B8232-F2D8-4286-AC13-422AA54194CE"),
                     userId =Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9") ,
-                    phoneNumber = "0122233879"
+                    phone_number = "0122233879"
                 } }
 
         }, };
 
-            var sourceImg = File.OpenRead(@"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\SeedingDataFromCSV\Book1.csv");
-            var memoryStream = new MemoryStream();
+            FileStream sourceImg = File.OpenRead(@"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\files\cap2.PNG");
+            MemoryStream memoryStream = new MemoryStream();
             sourceImg.CopyToAsync(memoryStream);
-            var bytearr = memoryStream.ToArray();
-            var assetdto = new asset { Id = Guid.Parse("D1E910408C5E4748A6252E493C7818D9"), field = bytearr };
+            byte[] bytearr = memoryStream.ToArray();
+            asset assetdto = new asset { Id = Guid.Parse("D1E910408C5E4748A6252E493C7818D9"), field = bytearr };
 
-            var valdLogin = new login { password = "UnVmvnspqYZtOlgWDkmkKAbuj7qrNOH9", userName = "surya123" };
+            login valdLogin = new login { password = "UnVmvnspqYZtOlgWDkmkKAbuj7qrNOH9", user_name = "surya123" };
 
             _context.Login.Add(valdLogin);
             _context.User.AddRange(list);
@@ -177,81 +176,84 @@ namespace AddressBookUnitTest
         }
 
         [Fact]
-        public async void GetAddressBookCount_Test()
+        public  void GetAddressBookCount_Test()
         {
-            var response = await _addresBookController.GetAddressBookCount() as OkObjectResult;
-            var items = Assert.IsType<int>(response.Value);
-            Assert.Equal(2, items);
+            OkObjectResult response =  _addresBookController.GetAddressBookCount() as OkObjectResult;
+            Assert.IsType<ResponseGetCountDTO>(response.Value);
+
+            ResponseGetCountDTO listBooks = response.Value as ResponseGetCountDTO;
+
+            Assert.Equal(2, listBooks.count);
         }
 
         [Fact]
-        public async void GetAllAddressBooksAccounts_Test()
+        public  void GetAllAddressBooksAccounts_Test()
         {
 
-            var okResult = await _addresBookController.GetAllAddressBooksAccounts(4, 1, "firstName", "ASC");
-            var notFoundResult = await _addresBookController.GetAllAddressBooksAccounts(10, 10, "lastName", "ASC");
+            ActionResult<List<UserDTO>> okResult =  _addresBookController.GetAllAddressBooksAccounts(4, 1, "firstName", "DSC");
+            ActionResult<List<UserDTO>> notFoundResult =  _addresBookController.GetAllAddressBooksAccounts(10, 10, "lastName", "ASC");
 
             Assert.IsType<OkObjectResult>(okResult.Result);
 
-            var list = okResult.Result as OkObjectResult;
+            OkObjectResult list = okResult.Result as OkObjectResult;
 
             Assert.IsType<List<UserDTO>>(list.Value);
 
-            var listBooks = list.Value as List<UserDTO>;
+            List<UserDTO> listBooks = list.Value as List<UserDTO>;
 
             Assert.Equal(2, listBooks.Count);
         }
 
         [Fact]
-        public async void GetAddressBook_Test()
+        public  void GetAddressBook_Test()
         {
-            var validId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9");
-            var invalidId = Guid.NewGuid();
-            var notFoundResult =await _addresBookController.GetAddressBook(invalidId);
-            var okResult =await _addresBookController.GetAddressBook(validId);
+            Guid validId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9");
+            Guid invalidId = Guid.NewGuid();
+            ActionResult<UserDTO> notFoundResult = _addresBookController.GetAddressBook(invalidId);
+            ActionResult<UserDTO> okResult = _addresBookController.GetAddressBook(validId);
 
 
-            var item = okResult.Result as OkObjectResult;
-            var bookItem = item.Value as UserDTO;
+            OkObjectResult item = okResult.Result as OkObjectResult;
+            UserDTO bookItem = item.Value as UserDTO;
 
-            Assert.IsType<NotFoundResult>(notFoundResult.Result);
+            Assert.IsType<NotFoundObjectResult>(notFoundResult.Result);
             Assert.IsType<OkObjectResult>(okResult.Result);
             Assert.IsType<UserDTO>(item.Value);
             Assert.Equal(validId, bookItem.Id);
-            Assert.Equal("abc", bookItem.firstName);
+            Assert.Equal("abc", bookItem.first_name);
         }
 
         [Fact]
-        public async void VerifyUser_Test()
+        public  void VerifyUser_Test()
         {
-            var inValidLogin = new LogInDTO { Password = "jna", userName = "ksnknc" };
-            var valdLogin = new LogInDTO { Password = "Surya@123", userName = "surya123" };
+            LogInDTO inValidLogin = new LogInDTO { password = "jna", user_name = "ksnknc" };
+            LogInDTO valdLogin = new LogInDTO { password = "Surya@123", user_name = "surya123" };
 
-            var unAuthorised = await _addresBookController.VerifyUser(inValidLogin);
-            var Authorised = await _addresBookController.VerifyUser(valdLogin);
+            IActionResult unAuthorised =  _addresBookController.VerifyUser(inValidLogin);
+            IActionResult Authorised =  _addresBookController.VerifyUser(valdLogin);
 
             Assert.IsType<UnauthorizedObjectResult>(unAuthorised);
             Assert.IsType<OkObjectResult>(Authorised);
         }
 
         [Fact]
-        public async void UploadFile_Test()
+        public  void UploadFile_Test()
         {
-            var file = new Mock<IFormFile>();
-            var sourceImg = File.OpenRead(@"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\files\cap2.PNG");
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
+            Mock<IFormFile> file = new Mock<IFormFile>();
+            FileStream sourceImg = File.OpenRead(@"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\files\cap2.PNG");
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
             writer.Write(sourceImg);
             writer.Flush();
             stream.Position = 0;
-            var fileName = "cap2.PNG";
+            string fileName = "cap2.PNG";
             file.Setup(f => f.OpenReadStream()).Returns(stream);
             file.Setup(f => f.FileName).Returns(fileName);
             file.Setup(f => f.Length).Returns(stream.Length);
-            var inputFile = file.Object;
+            IFormFile inputFile = file.Object;
 
-            var okResult =await _addresBookController.UploadFile(inputFile);
-            var result = okResult.Result as OkObjectResult;
+            ActionResult<UploadResponseDTO> okResult = _addresBookController.UploadFile(inputFile);
+            OkObjectResult result = okResult.Result as OkObjectResult;
 
             Assert.IsType<OkObjectResult>(okResult.Result); 
             Assert.IsType<UploadResponseDTO>(result.Value);
@@ -260,48 +262,52 @@ namespace AddressBookUnitTest
         }
 
         [Fact]
-        public async void Download_Test()
+        public  void Download_Test()
         {
-            var inValid = Guid.NewGuid();
-            var valid = Guid.Parse("D1E910408C5E4748A6252E493C7818D9");
+            Guid inValid = Guid.NewGuid();
+            Guid valid = Guid.Parse("D1E910408C5E4748A6252E493C7818D9");
 
-            var notFoundResult = await _addresBookController.Download(inValid);
-            var FoundResult = await _addresBookController.Download(valid);
+            IActionResult notFoundResult =  _addresBookController.Download(inValid);
+            IActionResult FoundResult =  _addresBookController.Download(valid);
 
-            Assert.IsType<NotFoundResult>(notFoundResult);
+            Assert.IsType<NotFoundObjectResult>(notFoundResult);
             Assert.IsType<FileContentResult>(FoundResult);
         }
 
         [Fact]
-        public async void SignUpAdmin_Test()
+        public  void SignUpAdmin_Test()
         {
-            var notexists = new SignupDTO {userName="suryaNew",password="sur22sgya@1Rs" };
-            var exists = new SignupDTO { userName = "surya123", password = "Surya@123" };
-         //   var sinup =await  _addresBookController.SignUpAdmin(dto);
+            SignupDTO notexists = new SignupDTO {user_name="suryaNew",password="sur22sgya@1Rs" };
+            SignupDTO exists = new SignupDTO { user_name = "surya123", password = "Surya@123" };
+            SignupDTO badRequest = new SignupDTO { user_name = "suryaNew", password = "gya1Rs" };
+            //   var sinup =await  _addresBookController.SignUpAdmin(dto);
 
-            var conflictResponse =await  _addresBookController.SignUpAdmin(exists);
-            var okResponse = await _addresBookController.SignUpAdmin(notexists);
+            IActionResult conflictResponse =  _addresBookController.SignUpAdmin(exists);
+            IActionResult okResponse =  _addresBookController.SignUpAdmin(notexists);
+      //      IActionResult OkbadRequest = _addresBookController.SignUpAdmin(badRequest);
 
             ObjectResult isAlreadyResponse = Assert.IsType<ObjectResult>(conflictResponse);
-      
+      //      ObjectResult badResponse = Assert.IsType<ObjectResult>(OkbadRequest);
+
             Assert.Equal(409, isAlreadyResponse.StatusCode);
-            Assert.IsType<OkObjectResult>(okResponse);
+            Assert.IsType<OkResult>(okResponse);
+       //     Assert.IsType<BadRequestObjectResult>(badResponse);
         }
 
         [Fact]
-        public async void AddNewAddressBook_Test()
+        public  void AddNewAddressBook_Test()
         {
-            var email = new UserDTO()
+            UserDTO email = new UserDTO()
             {
                 Id = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                firstName = "abc",
-                lastName = "xyz",
+                first_name = "abc",
+                last_name = "xyz",
 
                 Email = new List<EmailDTO>() {
                     new EmailDTO
                     {
-                        emailAddress = "abc@gmail.com",
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        email_address = "abc@gmail.com",
+                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
 
                     }, },
                 Address = new List<AddressDTO>() {
@@ -309,10 +315,10 @@ namespace AddressBookUnitTest
                     {
                         line1 = "1st",
                         line2 = "line2",
-                        country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
 
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
-                        stateName = "stateName",
+                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
+                        state_name = "stateName",
                         city = "city",
                         zipCode = "zipCode"
                     }, },
@@ -320,28 +326,28 @@ namespace AddressBookUnitTest
                 Phone = new List<PhoneDTO> {
                     new PhoneDTO
                     {
-                        type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
                   
               
-                        phoneNumber = "8152233879"
+                        phone_number = "8152233879"
                     }, new PhoneDTO
                     {
                 
-                        type = new TypeDTO{key= Guid.Parse("F87B8232-F2D8-4286-AC13-422AA54194CE") },
-                        phoneNumber = "8122233879"
+                        type = new TypeDTO{key= Guid.Parse("F87B8232-F2D8-4286-AC13-422AA54194CE").ToString() },
+                        phone_number = "8122233879"
                     } }
             };
-            var phone = new UserDTO()
+            UserDTO phone = new UserDTO()
             {
                 Id = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                firstName = "abc",
-                lastName = "xyz",
+                first_name = "abc",
+                last_name = "xyz",
 
                 Email = new List<EmailDTO>() {
                     new EmailDTO
                     {
-                        emailAddress = "abcabc@gmail.com",
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        email_address = "abcabc@gmail.com",
+               //         type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
 
                     }, },
                 Address = new List<AddressDTO>() {
@@ -349,10 +355,10 @@ namespace AddressBookUnitTest
                     {
                         line1 = "1st",
                         line2 = "line2",
-                        country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                //        country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
 
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
-                        stateName = "stateName",
+                 //       type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        state_name = "stateName",
                         city = "city",
                         zipCode = "zipCode"
                     }, },
@@ -360,23 +366,23 @@ namespace AddressBookUnitTest
                 Phone = new List<PhoneDTO> {
                     new PhoneDTO
                     {
-                        type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                  //      type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
 
 
-                        phoneNumber = "8152233879"
+                        phone_number = "8152233879"
                     } }
             };
-            var address = new UserDTO()
+            UserDTO address = new UserDTO()
             {
                 Id = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                firstName = "abc",
-                lastName = "xyz",
+                first_name = "abc",
+                last_name = "xyz",
 
                 Email = new List<EmailDTO>() {
                     new EmailDTO
                     {
-                        emailAddress = "abcabc@gmail.com",
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        email_address = "abcabc@gmail.com",
+                //        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
 
                     }, },
                 Address = new List<AddressDTO>() {
@@ -384,10 +390,10 @@ namespace AddressBookUnitTest
                     {
                         line1 = "1st",
                         line2 = "line2",
-                        country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                  //      country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
 
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
-                        stateName = "stateName",
+                  //      type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        state_name = "stateName",
                         city = "city",
                         zipCode = "zipCode"
                     }, },
@@ -395,21 +401,21 @@ namespace AddressBookUnitTest
                 Phone = new List<PhoneDTO> {
                     new PhoneDTO
                     {
-                        type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
-                        phoneNumber = "0152233879"
+                   //     type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        phone_number = "0152233879"
                     } }
             };
-            var saveToDb = new UserDTO()
+            UserDTO saveToDb = new UserDTO()
             {
                 Id = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                firstName = "abc",
-                lastName = "xyz",
+                first_name = "abc",
+                last_name = "xyz",
 
                 Email = new List<EmailDTO>() {
                     new EmailDTO
                     {
-                        emailAddress = "abcabc@gmail.com",
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        email_address = "abcabc@gmail.com",
+                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
 
                     }, },
                 Address = new List<AddressDTO>() {
@@ -417,10 +423,10 @@ namespace AddressBookUnitTest
                     {
                         line1 = "1sqwdty",
                         line2 = "line2",
-                        country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
 
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
-                        stateName = "stateName",
+                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
+                        state_name = "stateName",
                         city = "city",
                         zipCode = "zipCode"
                     }, },
@@ -428,15 +434,15 @@ namespace AddressBookUnitTest
                 Phone = new List<PhoneDTO> {
                     new PhoneDTO
                     {
-                        type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
-                        phoneNumber = "0152233879"
+                        type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
+                        phone_number = "8142255769"
                     } }
             };
        
-            var emailExists =await _addresBookController.AddNewAddressBook(email);
-            var phoneExists = await _addresBookController.AddNewAddressBook(phone);
-            var addressExists = await _addresBookController.AddNewAddressBook(address);
-            var save = await _addresBookController.AddNewAddressBook(saveToDb);
+            IActionResult emailExists = _addresBookController.AddNewAddressBook(email);
+            IActionResult phoneExists =  _addresBookController.AddNewAddressBook(phone);
+            IActionResult addressExists =  _addresBookController.AddNewAddressBook(address);
+            IActionResult save =  _addresBookController.AddNewAddressBook(saveToDb);
          //   var savenull = await _addresBookController.AddNewAddressBook(saveToDbNull);
 
 
@@ -452,33 +458,35 @@ namespace AddressBookUnitTest
             Assert.Equal(201, saveDb.StatusCode);
           //  Assert.Equal(404, saveDbNull.StatusCode);
         }
+
         [Fact]
-        public async void DeleteAddressBook_Test()
+        public  void DeleteAddressBook_Test()
         {
-            var id = Guid.NewGuid();
-            var existId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9");
+            Guid id = Guid.NewGuid();
+            Guid existId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9");
 
-            var response =await _addresBookController.DeleteAddressBook(id);
-            var okResponse = await _addresBookController.DeleteAddressBook(existId);
+            IActionResult response = _addresBookController.DeleteAddressBook(id);
+            IActionResult okResponse =  _addresBookController.DeleteAddressBook(existId);
 
-            Assert.IsType<NotFoundResult>(response);
+            Assert.IsType<NotFoundObjectResult>(response);
             Assert.IsType<OkResult>(okResponse);
 
         }
+
         [Fact]
-        public async void UpdateAddressBook_Test()
+        public  void UpdateAddressBook_Test()
         {
-            var account = new UserDTO()
+            UserDTO account = new UserDTO()
             {
                 Id = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                firstName = "abc",
-                lastName = "xyz",
+                first_name = "abc",
+                last_name = "xyz",
 
                 Email = new List<EmailDTO>() {
                     new EmailDTO
                     {
-                        emailAddress = "abc@gmail.com",
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        email_address = "abc@gmail.com",
+                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
 
                     }, },
                 Address = new List<AddressDTO>() {
@@ -486,10 +494,10 @@ namespace AddressBookUnitTest
                     {
                         line1 = "1st",
                         line2 = "line2",
-                        country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        country = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
 
-                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
-                        stateName = "stateName",
+                        type = new TypeDTO { key = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
+                        state_name = "stateName",
                         city = "city",
                         zipCode = "zipCode"
                     }, },
@@ -497,24 +505,24 @@ namespace AddressBookUnitTest
                 Phone = new List<PhoneDTO> {
                     new PhoneDTO
                     {
-                        type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362") },
+                        type = new TypeDTO{key= Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362").ToString() },
 
 
-                        phoneNumber = "8152233879"
+                        phone_number = "8152233879"
                     }, new PhoneDTO
                     {
 
-                        type = new TypeDTO{key= Guid.Parse("F87B8232-F2D8-4286-AC13-422AA54194CE") },
-                        phoneNumber = "8122233879"
+                        type = new TypeDTO{key= Guid.Parse("F87B8232-F2D8-4286-AC13-422AA54194CE").ToString() },
+                        phone_number = "8122233879"
                     } }
             };
-            var id = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9");
-            var inValid = Guid.NewGuid();
+            Guid id = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9");
+            Guid inValid = Guid.NewGuid();
 
-            var response =await _addresBookController.UpdateAddressBook(id,account);
-            var notFound = await _addresBookController.UpdateAddressBook(inValid, account);
+            IActionResult response = _addresBookController.UpdateAddressBook(account,id);
+            IActionResult notFound =  _addresBookController.UpdateAddressBook( account, inValid);
 
-            Assert.IsType<NotFoundResult>(notFound);
+            Assert.IsType<NotFoundObjectResult>(notFound);
             Assert.IsType<OkResult>(response);
 
         }
