@@ -18,13 +18,13 @@ namespace AddressBookAPI.Helpers
 
             CreateMap<address, AddressDTO>().ForMember(e => e.type, src => src.MapFrom(act => new TypeDTO { key = act.refTermId.ToString() }))
                        .ForMember(c => c.country, src => src.MapFrom(act => new TypeDTO { key = act.country.ToString() }));
-          
+
             CreateMap<email, EmailDTO>().ForMember(e => e.type, src => src.MapFrom(act => new TypeDTO { key = act.refTermId.ToString() }));
 
-            CreateMap<phone, PhoneDTO>().ForMember(e => e.type, src => src.MapFrom(act => new TypeDTO { key = act.refTermId.ToString() }));
+            CreateMap<phone, PhoneDTO>().ForMember(e => e.type, src => src.MapFrom(act => new TypeDTO { key =  act.refTermId.ToString() }));
 
 
-            
+
 
             CreateMap<user, UserDTO>();
 

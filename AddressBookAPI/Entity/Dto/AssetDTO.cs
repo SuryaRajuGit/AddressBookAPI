@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +10,8 @@ namespace AddressBookAPI.Entity.Dto
     {
         public Guid Id { get; set; }
 
-        public string file_name { get; set; }
+        [JsonProperty(PropertyName = "file_name")]
+        public string fileName { get; set; }
 
         public byte[] file { get; set; }
 

@@ -13,7 +13,7 @@ namespace AddressBookAPI.Entity.Models
     
         public int Id { get; set; }
 
-        public string email_address { get; set; }
+        public string emailAddress { get; set; }
        
         public Guid userId { get; set; }
         public user user { get; set; }

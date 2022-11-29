@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,7 +10,8 @@ namespace AddressBookAPI.Entity.Dto
     public class SignupDTO
     {
         [Required]
-        public string user_name {get;set;}
+        [JsonProperty(PropertyName = "user_name")]
+        public string userName {get;set;}
 
         [Required]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,15}$",

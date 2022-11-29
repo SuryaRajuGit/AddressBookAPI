@@ -14,13 +14,9 @@ namespace AddressBookAPI.Repository
 {
     public  interface IAddressBookRepository
     {
-        public string GetType(Guid item);
-
-    
+        public string GetType(Guid item);  
 
         public string loginDetails(string userName );
-
-    //    public IEnumerable<user> ListOfAccounts(string sortBy);
 
         public user GetAccount(Guid id, UserDTO userDTO);
 
@@ -28,12 +24,13 @@ namespace AddressBookAPI.Repository
 
         public int GetAddressBookCount();
 
-        public string EmailList(ICollection<EmailDTO> email);
+        public string EmailList(ICollection<EmailDTO> email,Guid id);
 
+        public List<refTerm> getRefSetData(string key);
 
-        public string PhoneList(ICollection<PhoneDTO> phone);
+        public string PhoneList(ICollection<PhoneDTO> phone, Guid id);
 
-        public string AdderessList(ICollection<AddressDTO> address);
+        public string AdderessList(ICollection<AddressDTO> address,Guid id);
 
         public void  RemoveAccount(user account);
 
@@ -45,13 +42,11 @@ namespace AddressBookAPI.Repository
 
         public byte[] GetFile(Guid id);
 
-   //     public user GetAddressBook(Guid id, UserDTO userDTO);
-
         public void SinupAdmin(login sinupModel);
 
         public bool isUserNameExists(string text);
 
-        public List<user> Pagenation(int size,int pageNo);
+        public List<user> Pageination(int size,int pageNo);
 
 
     }

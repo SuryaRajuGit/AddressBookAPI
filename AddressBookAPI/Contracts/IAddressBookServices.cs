@@ -1,5 +1,6 @@
 ﻿
 using AddressBookAPI.Entity.Dto;
+using AddressBookAPI.Entity.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
@@ -12,9 +13,7 @@ namespace AddressBookAPI.Services
 {
     public interface IAddressBookServices
     {
-        public logInResponseDTO VerifyUser(LogInDTO logInDTO);
-
-        
+        public logInResponseDTO VerifyUser(LogInDTO logInDTO); 
 
         public int GetAddressBookCount();
 
@@ -22,7 +21,6 @@ namespace AddressBookAPI.Services
 
         public ErrorDTO UpdateAddressBook(Guid id, UserDTO userDTO);
 
-        public ErrorDTO Duplicates(UserDTO userDTO);
 
         public List<UserDTO> GetAllAddressBooks(int size, int pageNo, string sortBy, string sortOrder);
 
@@ -42,10 +40,12 @@ namespace AddressBookAPI.Services
 
         public Guid? saveToDatabase(UserDTO userDTO);
 
-        public ErrorDTO EmailExists(ICollection<EmailDTO> email);
+        public List<RefSetResponseDto> getRefSetData(string key);
 
-        public ErrorDTO PhoneExists(ICollection<PhoneDTO> phone);
+        public ErrorDTO EmailExists(ICollection<EmailDTO> email,Guid id);
 
-        public ErrorDTO AddressExists(ICollection<AddressDTO> address);
+        public ErrorDTO PhoneExists(ICollection<PhoneDTO> phone,Guid id);
+
+        public ErrorDTO AddressExists(ICollection<AddressDTO> address,Guid id);
     }
 }

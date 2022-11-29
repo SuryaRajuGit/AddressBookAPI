@@ -24,6 +24,8 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Swashbuckle.Swagger.Annotations;
+using AddressBookAPI.Entity.Models;
+using System.Net.Mime;
 
 namespace AddressBookAPI.Controllers
 {
@@ -39,17 +41,21 @@ namespace AddressBookAPI.Controllers
         {
             _addressBookServices = addressBookServices;
             _logger = logger;
-      
         }
         [HttpPost]
-        [Route("account")] //Adds new AddressBook to database
+        [Route("account")] //
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status400BadRequest)]
         [ProducesResponseType( StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status404NotFound)]
-        //  [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public  IActionResult AddNewAddressBook([FromBody]UserDTO userDTO)
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///Adds new AddressBook to database
+        ///</summary>
+        ///<param name="userDTO">new addressbook data</param>
+        ///<returns>New AddressBook created</returns>
+        public IActionResult AddNewAddressBook([FromBody]UserDTO userDTO)
         {
             _logger.LogInformation("adding new addressbook started");
           
@@ -59,16 +65,16 @@ namespace AddressBookAPI.Controllers
                 ErrorDTO badRequest = _addressBookServices.modelStateInvalid(ModelState);
                 return BadRequest(badRequest) ;
             }
+            Guid id = Guid.Empty;
             //takes Arg as Email Model returns string, checks email exists in database
-            ErrorDTO isEmailExists = _addressBookServices.EmailExists(userDTO.Email);
+            ErrorDTO isEmailExists = _addressBookServices.EmailExists(userDTO.Email,id);
             if(isEmailExists != null)
             {
                 _logger.LogError("Email Already Exists "+isEmailExists);
                 return StatusCode(409, isEmailExists);
-               
             }
             //takes Arg as Phone Model returns string, checks phone exists in database
-            ErrorDTO isPhoneExists = _addressBookServices.PhoneExists(userDTO.Phone);
+            ErrorDTO isPhoneExists = _addressBookServices.PhoneExists(userDTO.Phone,id);
             if(isPhoneExists != null)
             {
                 _logger.LogError("Phone Already Exists "+isPhoneExists);
@@ -76,7 +82,7 @@ namespace AddressBookAPI.Controllers
                 
             }
             //takes Arg as Address Model returns string, checks Address exists in database
-            ErrorDTO isAddressExists = _addressBookServices.AddressExists(userDTO.Address);
+            ErrorDTO isAddressExists = _addressBookServices.AddressExists(userDTO.Address,id);
             if (isAddressExists != null)
             {
                 _logger.LogError("Address Already Exists "+isAddressExists);
@@ -84,23 +90,29 @@ namespace AddressBookAPI.Controllers
                 
             }
             //takes Arg as user Dto returns Guid, saves user data into database
-            Guid? savetoDb =  _addressBookServices.saveToDatabase(userDTO);
-            if (savetoDb == null)
+            Guid? response =  _addressBookServices.saveToDatabase(userDTO);
+            if (response == null)
             {
                 _logger.LogError("meta data not found");
-                return NotFound(new ErrorDTO {type="NotFound",description="Meta Data not found in the database" });
+                return NotFound(new ErrorDTO {type="meta-data",description="Meta Data not found in the database" });
             }
             _logger.LogInformation("New AddressBook Created");
-            return StatusCode(201, savetoDb);
+            return StatusCode(201, response);
 
 
         }
 
         [HttpPost]
-        [Route("signup")] //Creates new Admin
+        [Route("signup")] //
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///Creates new Admin
+        ///</summary>
+        ///<param name="sinupDTO">New login detials</param>
+        ///<returns>Created New Admin</returns>
         public IActionResult SignUpAdmin([FromBody] SignupDTO sinupDTO)
         {
             _logger.LogInformation("Signup admin started");
@@ -111,29 +123,33 @@ namespace AddressBookAPI.Controllers
                 return BadRequest(badRequest);
             }
             // takes Arg as sinup Dto returns string, checks new login details exists in database
-           
             string response = _addressBookServices.SignupAdmin(sinupDTO);
             if (response == null)
             {
                 _logger.LogError("username already exists");
                 return StatusCode(409, new ErrorDTO
                 {
-                    type = "Conflict",
+                    type = "AddressBook",
                     description = response +
                     "  already exists"
                 });
             }
             _logger.LogInformation("new signup created");
-            
-            return Ok();
+            return Ok("Created New Admin");
         }
 
 
         [HttpDelete]
+        [Route("account/{id:Guid}")] 
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
-        [Route("account/{id:Guid}")] //Deletes Addressbook from database
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///Deletes Addressbook from database
+        ///</summary>
+        ///<param name="id">Guid of AddressBook</param>
+        ///<returns>AddressBook Deleted</returns>
         public IActionResult  DeleteAddressBook(Guid id)
         {
             _logger.LogInformation("deleting addressbook started");
@@ -142,20 +158,28 @@ namespace AddressBookAPI.Controllers
             if(response == null)
             {
                 _logger.LogError("user notfound");
-                return NotFound(new ErrorDTO { type = "Delete AddressBook", 
-                    description = "Data not found with the Guid in the database" });
+                return NotFound(new ErrorDTO { type = "AddressBook", 
+                    description = "AddressBook not found with the Guid in the database"
+                });
             }
             _logger.LogInformation("address boook deleted");
-            return Ok();
+            return Ok("AddressBook Deleted");
         }
 
         [HttpPut]
-        [Route("account/{id:Guid}")] //Updates existing AddressBook in database
+        [Route("account/{id:Guid}")] //
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///Updates existing AddressBook in database
+        ///</summary>
+        ///<param name="userDTO">Guid of AddressBook</param>
+        ///<param name="id">Guid of AddressBook</param>
+        ///<returns>AddressBook updated</returns>
         public IActionResult UpdateAddressBook([FromBody] UserDTO userDTO, [FromRoute] Guid id)
         {
             
@@ -166,42 +190,51 @@ namespace AddressBookAPI.Controllers
                 return BadRequest(badRequest);
             }
             _logger.LogInformation("updating  addressbook started");
-            //  var e = ModelState.Values.SelectMany(s => s ValidationState.ToString() == "Valid").    //Select(s => s).FirstOrDefault(s => s.Select(s => s.) .ToString() == "Valid").ToString();
-            //var ve = ModelState.Values.Select(s => s.Errors.Select(s => s.ErrorMessage)
-            //       .FirstOrDefault()).FirstOrDefault();
-            try
+            ErrorDTO isEmailExists = _addressBookServices.EmailExists(userDTO.Email,id);
+            if (isEmailExists != null)
             {
-                ErrorDTO response = _addressBookServices.Duplicates(userDTO);
-                if (response !=null )
-                {
-                    _logger.LogError("Conflict");
-                    return StatusCode(409,response);
-                }
+                _logger.LogError("Email Already Exists " + isEmailExists);
+                return StatusCode(409, isEmailExists);
             }
-            catch
+            //takes Arg as Phone Model returns string, checks phone exists in database
+            ErrorDTO isPhoneExists = _addressBookServices.PhoneExists(userDTO.Phone,id);
+            if (isPhoneExists != null)
             {
-                _logger.LogError("NotFound");
-                return NotFound(new ErrorDTO { type = "NotFound", description = "meta-data not found" });
+                _logger.LogError("Phone Already Exists " + isPhoneExists);
+                return StatusCode(409, isPhoneExists);
+
             }
-            
-                //takes Args Guid and user Dto ,updates Addressbook in database.
-             ErrorDTO saveResponse =  _addressBookServices.UpdateAddressBook(id, userDTO);
+            //takes Arg as Address Model returns string, checks Address exists in database
+            ErrorDTO isAddressExists = _addressBookServices.AddressExists(userDTO.Address,id);
+            if (isAddressExists != null)
+            {
+                _logger.LogError("Address Already Exists " + isAddressExists);
+                return StatusCode(409, isAddressExists);
+
+            }
+            //takes Args Guid and user Dto ,updates Addressbook in database.
+            ErrorDTO saveResponse =  _addressBookServices.UpdateAddressBook(id, userDTO);
             if (saveResponse != null)
             {
                 _logger.LogError("NotFound");
                 return NotFound(saveResponse);
             }
 
-
             _logger.LogInformation("addressbook updated");
-            return Ok();
+            return Ok("AddressBook updated");
         }
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("auth/signin")] //checks the user login details in database
+        [Route("auth/signin")] //
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///checks the user login details in database
+        ///</summary>
+        ///<param name="logInDTO">login details</param>
+        ///<returns>jwt token </returns>
         public IActionResult VerifyUser([FromBody]LogInDTO logInDTO ) 
         {
             _logger.LogInformation("login user started");
@@ -220,7 +253,7 @@ namespace AddressBookAPI.Controllers
                 _logger.LogError("entered wrong password");
                 return Unauthorized(new ErrorDTO
                 {
-                    type = "Unauthorized",
+                    type = "Login",
                     description = 
                     "Entered wrong login details"
                 });
@@ -230,10 +263,19 @@ namespace AddressBookAPI.Controllers
         }
 
         [HttpGet]
-        [Route("account")] //Retervies all the Addressbooks in the database
+        [Route("account")] //
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///Retervies all the Addressbooks in the database
+        ///</summary>
+        ///<param name="size">size of adressBook ></param>
+        ///<param name="pageNo">page no of addressbook</param>
+        ///<param name="sortBy">to sort addressbook firstname or lastname</param>
+        ///<param name="sortOrder">sort addressbook ascending or descending</param>
+        ///<returns>list of addressbooks</returns>
         public ActionResult<List<UserDTO>> GetAllAddressBooksAccounts(int size, int pageNo, string sortBy, string sortOrder)
         {
             _logger.LogInformation("getting all addressbooks started");
@@ -242,16 +284,21 @@ namespace AddressBookAPI.Controllers
              if (response == null)
             {
                 _logger.LogError("data not found");
-                return NotFound(new ErrorDTO {type="AddressBooks",description="Data not found in the database" }) ;
+                return StatusCode(204,"No Data in Database") ;
             }
             _logger.LogInformation("all addressbooks retrieved");
             return Ok(response);
         }
 
         [HttpGet]
-        [Route("account/count")] // Gets the count of addressbooks in the database
+        [Route("account/count")] // 
         [ProducesResponseType(typeof(ResponseGetCountDTO),StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///Gets the count of addressbooks in the database
+        ///</summary>
+        ///<returns>checks the user login details in database</returns>
         public IActionResult GetAddressBookCount()
         {
             _logger.LogInformation("getting number of addressbooks started");
@@ -262,10 +309,16 @@ namespace AddressBookAPI.Controllers
         }
 
         [HttpGet] 
-        [Route("get/account/{id:Guid}")] // Gets single  AddressBook based on user Id.
+        [Route("get/account/{id:Guid}")] // 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///Gets single  AddressBook based on user Id.
+        ///</summary>
+        ///<param name="id">Guid of Addressbook ></param>
+        ///<returns>AddressBook</returns>
         public ActionResult<UserDTO> GetAddressBook(Guid id)
         {
             _logger.LogInformation("getting single addressbook started");
@@ -274,16 +327,22 @@ namespace AddressBookAPI.Controllers
             if(response == null)
             {
                 _logger.LogError("data not found");
-                return NotFound(new ErrorDTO {type= "NotFound",description="AdderessBook not found in the database" });
+                return NotFound(new ErrorDTO {type= "AddressBook",description="AdderessBook not found in the database" });
             }
             _logger.LogInformation("addressbook retrieved");
             return Ok(response);
         }
 
         [HttpPost]
-        [Route("asset")] // uploads file into database 
+        [Route("asset")] // 
         [ProducesResponseType(typeof(UploadResponseDTO) ,StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///uploads file into database 
+        ///</summary>
+        ///<param name="file">Guid of Addressbook ></param>
+        ///<returns>UploadResponseDTO</returns>
         public ActionResult<UploadResponseDTO> UploadFile(IFormFile file)
         {
             _logger.LogInformation("uploading file started");
@@ -293,25 +352,60 @@ namespace AddressBookAPI.Controllers
             return Ok(response);
         }
 
-        [HttpGet] //downloads file from database
+        [HttpGet] //
         [Route("asset/{id:Guid}")]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult Download(Guid id)
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        ///downloads file from database
+        ///</summary>
+        ///<param name="id">Guid of file ></param>
+        ///<returns>image file</returns>
+        public ActionResult Download(Guid id)
         {
             _logger.LogInformation("download file started");
-            // takes Args Guid ,returns file bytes[] ,gets file bytes[] from database based on file id.
-            byte[] fileBytes = _addressBookServices.Download(id);
-            if(fileBytes == null)
+            Byte[] fileBytes = _addressBookServices.Download(id);
+
+            if (fileBytes == null)
             {
                 _logger.LogError("file not found");
-                return NotFound(new ErrorDTO {type= "NotFound",description="asset not exists in database" });
+                return NotFound(new ErrorDTO { type = "Asset", description = "asset not exists in database" });
             }
             _logger.LogInformation("file returned");
-            return File(fileBytes, "image/jpeg");
+             return File(fileBytes, Constants.ConetentType);
         }
 
+        [HttpGet]
+        [Route("meta/{key}")]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status500InternalServerError)]
+        ///<summary>
+        /// gets list of meta-data linked to the key 
+        ///</summary>
+        ///<param name="key">Guid of file ></param>
+        ///<returns>RefSetResponseDto</returns>
+        public ActionResult<List<RefSetResponseDto>> RefsetData(string key)
+        {
+            _logger.LogInformation("geting refset data started");
+            List<RefSetResponseDto> response = _addressBookServices.getRefSetData(key);
+            if(response == null)
+            {
+                return NotFound(new ErrorDTO
+                {
+                    type="key",
+                    description=key +" key not exists in database"
+                });
+            }
+            if(response.Count == 0)
+            {
+                return NoContent();
+            }
+            return response;   
+        }
     }
 }
 

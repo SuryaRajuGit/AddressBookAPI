@@ -1,9 +1,12 @@
 ﻿
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
 
 namespace AddressBookAPI.Entity.Dto
 {
@@ -14,11 +17,13 @@ namespace AddressBookAPI.Entity.Dto
 
         [Required]
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
-        public string first_name { get; set; }
+        [JsonProperty(PropertyName = "first_name")]
+        public string firstName { get; set; }
 
        
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
-        public string last_name { get; set; }
+        [JsonProperty(PropertyName = "last_name")]
+        public string lastName { get; set; }
 
         [Required]
         public ICollection<AddressDTO> Address { get; set; }

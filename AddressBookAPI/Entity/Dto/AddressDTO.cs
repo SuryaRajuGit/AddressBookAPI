@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -21,7 +22,8 @@ namespace AddressBookAPI.Entity.Dto
         public string zipCode { get; set; }
 
         [Required]
-        public string state_name { get; set; }
+        [JsonProperty(PropertyName = "state_name")]
+        public string stateName { get; set; }
 
         [Required]
         public TypeDTO country { get; set; }

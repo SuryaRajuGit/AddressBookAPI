@@ -1,4 +1,5 @@
 ﻿
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,9 +12,9 @@ namespace AddressBookAPI.Entity.Dto
     public class EmailDTO
     {
         [Required]
-        [Display(Name = "email")]
+        [JsonProperty(PropertyName = "email_address")]
         [RegularExpression(@"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", ErrorMessage = "Enter Valid email address")]
-        public string email_address { get; set; }
+        public string emailAddress { get; set; }
 
         [Required]
         public TypeDTO type { get; set; }

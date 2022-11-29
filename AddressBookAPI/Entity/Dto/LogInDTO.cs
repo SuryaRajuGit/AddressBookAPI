@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,7 +12,8 @@ namespace AddressBookAPI.Entity.Dto
       
 
         [Required]
-        public string user_name { get; set; }
+        [JsonProperty(PropertyName = "user_name")]
+        public string userName { get; set; }
 
         [Required]
         public string password { get; set; }

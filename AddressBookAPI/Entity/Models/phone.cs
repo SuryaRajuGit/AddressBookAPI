@@ -11,7 +11,7 @@ namespace AddressBookAPI.Entity.Models
     {
         public int Id { get; set; }
 
-        public string phone_number { get; set; }
+        public string phoneNumber { get; set; }
 
         public Guid userId { get; set; }
         public user user { get; set; }

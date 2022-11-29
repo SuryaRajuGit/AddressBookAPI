@@ -19,7 +19,7 @@ namespace AddressBookAPI.Entity.Models
 
         public string zipCode { get; set; }
 
-        public string state_name { get; set; }
+        public string stateName { get; set; }
 
         public Guid country { get; set; }
 
