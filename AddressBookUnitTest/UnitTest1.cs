@@ -168,6 +168,28 @@ namespace AddressBookUnitTest
 
             login valdLogin = new login { password = "UnVmvnspqYZtOlgWDkmkKAbuj7qrNOH9", userName = "surya123" };
 
+            refTerm termData = new refTerm
+            {
+                Id =Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
+                key = "WORK",
+                description= "work type"
+            };
+            refSet setData = new refSet
+            {
+                Id = Guid.Parse("C8DC949E-47F7-4EAC-A83D-D0EBC8031300"),
+                key= "PHONE_NUMBER_TYPE",
+                description= "phone"
+            };
+            setRefTerm setTerm = new setRefTerm
+            {
+                Id = Guid.NewGuid(),
+                refSetId = Guid.Parse("C8DC949E-47F7-4EAC-A83D-D0EBC8031300"),
+                refTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362")
+            };
+
+            _context.Add(termData);
+            _context.Add(setData);
+            _context.Add(setTerm);
             _context.Login.Add(valdLogin);
             _context.User.AddRange(list);
             _context.AssetDTO.Add(assetdto);
@@ -527,6 +549,27 @@ namespace AddressBookUnitTest
             Assert.IsType<OkObjectResult>(response);
 
         }
+
+        [Fact]
+        public void RefsetData_Test()
+        {
+            string key = "PHONE_NUMBER_TYPE";
+
+            ActionResult<List<RefSetResponseDto>> response = _addresBookController.RefsetData(key);
+
+            Assert.IsType<OkObjectResult>(response.Result);
+
+            OkObjectResult item = response.Result as OkObjectResult;
+
+            Assert.IsType<List<RefSetResponseDto>>(item.Value);
+
+            List<RefSetResponseDto> list = item.Value as List<RefSetResponseDto>;     
+
+            Assert.Equal("WORK",list[0].key);
+
+        }
+
+
         public void Disposal()
 
         {

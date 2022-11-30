@@ -1,7 +1,6 @@
 ﻿
 using AddressBookAPI.Entity.Dto;
 using AddressBookAPI.Helpers;
-
 using AddressBookAPI.Repository;
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -136,7 +135,7 @@ namespace AddressBookAPI.Services
                 foreach (string item in user.Email.Select(s => s.type.key))
                 {
                     Guid sample;
-                    if (Guid.TryParse(item, out sample))
+                    if (!Guid.TryParse(item, out sample))
                     {
                         break;
                     }
@@ -146,7 +145,7 @@ namespace AddressBookAPI.Services
                 foreach (string item in user.Phone.Select(s => s.type.key))
                 {
                     Guid sample;
-                    if (Guid.TryParse(item, out sample))
+                    if (!Guid.TryParse(item, out sample))
                     {
                         break;
                     }
@@ -590,7 +589,7 @@ namespace AddressBookAPI.Services
             foreach (string item in addressBook.Email.Select(s => s.type.key))
             {
                 Guid sample;
-                if (Guid.TryParse(item, out sample))
+                if (!Guid.TryParse(item, out sample))
                 {
                     break;
                 }
@@ -600,7 +599,7 @@ namespace AddressBookAPI.Services
             foreach (string item in addressBook.Phone.Select(s => s.type.key))
             {
                 Guid sample;
-                if (Guid.TryParse(item, out sample))
+                if (!Guid.TryParse(item, out sample))
                 {
                     break;
                 }

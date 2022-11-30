@@ -404,7 +404,7 @@ namespace AddressBookAPI.Controllers
             {
                 return NoContent();
             }
-            return response;   
+            return Ok(response);   
         }
     }
 }
