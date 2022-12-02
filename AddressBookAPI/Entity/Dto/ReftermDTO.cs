@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,9 +10,11 @@ namespace AddressBookAPI.Entity.Dto
     {
         public Guid Id { get; set; }
 
-        public string key { get; set; }
+        [JsonProperty(PropertyName = "key")]
+        public string Key { get; set; }
 
-        public string description { get; set; }
+        [JsonProperty(PropertyName = "description")]
+        public string Description { get; set; }
 
 
     }

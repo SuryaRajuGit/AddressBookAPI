@@ -16,27 +16,25 @@ namespace AddressBookAPI.Helpers
         public ApplicationMapper()
         {
 
-            CreateMap<address, AddressDTO>().ForMember(e => e.type, src => src.MapFrom(act => new TypeDTO { key = act.refTermId.ToString() }))
-                       .ForMember(c => c.country, src => src.MapFrom(act => new TypeDTO { key = act.country.ToString() }));
+            CreateMap<Address, AddressDTO>().ForMember(e => e.Type, src => src.MapFrom(act => new TypeDTO { Key = act.RefTermId.ToString() }))
+                       .ForMember(c => c.Country, src => src.MapFrom(act => new TypeDTO { Key = act.Country.ToString() }));
 
-            CreateMap<email, EmailDTO>().ForMember(e => e.type, src => src.MapFrom(act => new TypeDTO { key = act.refTermId.ToString() }));
+            CreateMap<Email, EmailDTO>().ForMember(e => e.Type, src => src.MapFrom(act => new TypeDTO { Key = act.RefTermId.ToString() }));
 
-            CreateMap<phone, PhoneDTO>().ForMember(e => e.type, src => src.MapFrom(act => new TypeDTO { key =  act.refTermId.ToString() }));
-
-
+            CreateMap<Phone, PhoneDTO>().ForMember(e => e.Type, src => src.MapFrom(act => new TypeDTO { Key =  act.RefTermId.ToString() }));
 
 
-            CreateMap<user, UserDTO>();
+            CreateMap<User, UserDTO>();
 
-            CreateMap<AddressDTO, address>().ForMember
-                (t => t.refTermId, dst => dst.MapFrom(src => src.type.key))
-                .ForMember(c => c.country, dst => dst.MapFrom(src => src.country.key));
+            CreateMap<AddressDTO, Address>().ForMember
+                (t => t.RefTermId, dst => dst.MapFrom(src => src.Type.Key))
+                .ForMember(c => c.Country, dst => dst.MapFrom(src => src.Country.Key));
 
-            CreateMap<EmailDTO, email>().ForMember
-                (t => t.refTermId, dst => dst.MapFrom(src => src.type.key));
-            CreateMap<PhoneDTO, phone>().ForMember
-                (t => t.refTermId, dst => dst.MapFrom(src => src.type.key));
-            CreateMap<UserDTO, user>();
+            CreateMap<EmailDTO, Email>().ForMember
+                (t => t.RefTermId, dst => dst.MapFrom(src => src.Type.Key));
+            CreateMap<PhoneDTO, Phone>().ForMember
+                (t => t.RefTermId, dst => dst.MapFrom(src => src.Type.Key));
+            CreateMap<UserDTO, User>();
 
 
         }

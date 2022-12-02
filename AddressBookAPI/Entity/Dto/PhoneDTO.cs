@@ -16,9 +16,10 @@ namespace AddressBookAPI.Entity.Dto
         [Required]
         [MinLength(10)]
         [JsonProperty(PropertyName = "phone_number")]
-        public string phoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         [Required]
-        public TypeDTO type { get; set; }
+        [JsonProperty(PropertyName = "type")]
+        public TypeDTO Type { get; set; }
     }
 }

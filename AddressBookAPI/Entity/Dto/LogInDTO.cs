@@ -13,9 +13,10 @@ namespace AddressBookAPI.Entity.Dto
 
         [Required]
         [JsonProperty(PropertyName = "user_name")]
-        public string userName { get; set; }
+        public string UserName { get; set; }
 
         [Required]
-        public string password { get; set; }
+        [JsonProperty(PropertyName = "password")]
+        public string Password { get; set; }
     }
 }

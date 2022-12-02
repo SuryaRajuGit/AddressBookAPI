@@ -29,12 +29,8 @@ namespace AddressBookAPI.Repository
 
         public AddressBookRepository(AddressBookContext context)
         {
-            _context = context;
-
-            
-            
+            _context = context;  
         }
-        //
         ///<summary>
         /// takes Args username string ,returns string ,checks username exists in database
         ///</summary>
@@ -42,31 +38,30 @@ namespace AddressBookAPI.Repository
         ///<returns>string</returns>
         public string loginDetails(string userName)
         {
-            return _context.Login.Where(s => s.userName == userName).Select(s => s.password).FirstOrDefault();
+            return _context.Login.Where(src => src.UserName == userName).Select(src => src.Password).FirstOrDefault();
             
         }
-        //
 
         ///<summary>
         /// takes Args username string ,returns bool ,checks username exists in database
         ///</summary>
         ///<param name="text"></param>
         ///<returns>bool</returns>
-        public bool isUserNameExists(string text)
+        public bool IsUserNameExists(string text)
         {
-            List<string> listOfAdmins =  _context.Login.Select(s => s.userName).ToList();
+            List<string> listOfAdmins =  _context.Login.Select(src => src.UserName).ToList();
             return listOfAdmins.Contains(text);
         }
 
-        //
+      
         /// takes Args size Int,pageNo Int ,returns List<user> ,Applys Pagenation 
         ///</summary>
         ///<param name="size"></param>
         ///<param name="pageNo"></param>
         ///<returns>List of addressBooks</returns>
-        public List<user> Pageination( int size, int pageNo)
+        public List<User> GetPageinatedList( int size, int pageNo)
         {
-            List<user> listOfUsers  = _context.User.Include(e => e.email).Include(p => p.phone).Include(a => a.address)
+            List<User> listOfUsers  = _context.User.Include(eml => eml.Email).Include(phn => phn.Phone).Include(art => art.Address)
               .Skip((pageNo - 1) * 5)
               .Take(size)
               .ToList();
@@ -80,31 +75,37 @@ namespace AddressBookAPI.Repository
         ///<param name="id"></param>
         ///<param name="userDTO"></param>
         ///<returns>user</returns>
-        public user GetAccount(Guid id, UserDTO userDTO)
+        public User GetAccount(Guid id, UserDTO userDTO)
         {
 
-            return  _context.User.Include(e => e.email).Include(p => p.phone).Include(a => a.address).FirstOrDefault(s => s.Id == id);
+            return  _context.User.Include(eml => eml.Email).Include(phn => phn.Phone).Include(art => art.Address).FirstOrDefault(src => src.Id == id);
         }
 
-        // 
+        
         ///<summary>
         ///saves user Dto into database
         ///</summary>
         ///<param name="account"></param>
-        public void UpdateToDataBase(user account)
+        public void UpdateToDataBase(User account)
         {
             _context.Update(account);
             _context.SaveChanges();
         }
+
+        public bool IsCountryExixsted(string type)
+        {
+            return _context.RefTerm.Any(cus => cus.Id == Guid.Parse(type));
+        }
+
 
         ///<summary>
         ///returns AddressBook
         ///</summary>
         ///<param name="id"></param>
         ///<returns>user</returns>
-        public user GetAddressbook(Guid id)
+        public User GetAddressbook(Guid id)
         {
-            return _context.User.Include(s => s.email).Include(a => a.address).Include(p => p.phone).FirstOrDefault(s => s.Id == id);
+            return _context.User.Include(src => src.Email).Include(art => art.Address).Include(phn => phn.Phone).FirstOrDefault(src => src.Id == id);
         }
 
         ///<summary>
@@ -112,14 +113,14 @@ namespace AddressBookAPI.Repository
         ///</summary>
         ///<param name="key"></param>
         ///<returns>List<refTerm></returns>
-        public List<refTerm> getRefSetData(string key)
+        public List<RefTerm> GetRefSetData(string key)
         {
-            bool isExists = _context.RefSet.Any(cus => cus.key == key);
+            bool isExists = _context.RefSet.Any(cus => cus.Key == key);
             if (!isExists)
             {
                 return null;
             }
-            List<refTerm> refTermList = _context.SetRefTerm.Include(s => s.refSet).Include(s => s.refTerm).Where(w => w.refSet.key == key).Select(s => s.refTerm).ToList();
+            List<RefTerm> refTermList = _context.SetRefTerm.Include(src => src.RefSet).Include(src => src.RefTerm).Where(wrt => wrt.RefSet.Key == key).Select(src => src.RefTerm).ToList();
             return refTermList;
 
         }
@@ -133,7 +134,7 @@ namespace AddressBookAPI.Repository
         public int GetAddressBookCount()
         {
            
-            return _context.User.Include(s =>s.email).Include(a => a.address).Include(p => p.phone).Select(s => s.Id).Count();
+            return _context.User.Include(s =>s.Email).Include(a => a.Address).Include(p => p.Phone).Select(s => s.Id).Count();
         
         }
 
@@ -147,9 +148,9 @@ namespace AddressBookAPI.Repository
         public string EmailList(ICollection<EmailDTO> email,Guid id)
         {
             
-            List<string> emailList = id != Guid.Empty ? _context.Email.Where(s => s.userId != id).Select(s => s.emailAddress).ToList() :
-                    _context.Email.Select(s => s.emailAddress).ToList();
-            foreach (string item in email.Select(s => s.emailAddress))
+            List<string> emailList = id != Guid.Empty ? _context.Email.Where(src => src.UserId != id).Select(src=> src.EmailAddress).ToList() :
+                    _context.Email.Select(src => src.EmailAddress).ToList();
+            foreach (string item in email.Select(src => src.EmailAddress))
             {
                 bool userEmail = emailList.Contains(item);   
                 if (userEmail)
@@ -169,9 +170,9 @@ namespace AddressBookAPI.Repository
         ///<returns>string<refTerm></returns>
         public string PhoneList(ICollection<PhoneDTO> phone,Guid id)
         {
-            List<string> phoneList = id != Guid.Empty ? _context.Phone.Where(s => s.userId != id).Select(s => s.phoneNumber).ToList() :
-                    _context.Phone.Select(s => s.phoneNumber).ToList();
-            foreach (string item in phone.Select(s => s.phoneNumber))
+            List<string> phoneList = id != Guid.Empty ? _context.Phone.Where(src => src.UserId != id).Select(src => src.PhoneNumber).ToList() :
+                    _context.Phone.Select(src => src.PhoneNumber).ToList();
+            foreach (string item in phone.Select(src => src.PhoneNumber))
             {
                 bool userPhone = phoneList.Contains(item);     //_context.Phone.Where(w => w.phoneNumber == item).FirstOrDefault();
                 if (userPhone)
@@ -195,20 +196,20 @@ namespace AddressBookAPI.Repository
             foreach (AddressDTO item in addresses)
             {
                 string josnObjj = JsonConvert.SerializeObject(item);
-                foreach (address each in _context.Address)
+                foreach (Address each in _context.Address)
                 {
                     AddressDTO addressObj = new AddressDTO
                     {
-                        line1 = each.line1,
-                        line2 = each.line2,
-                        city = each.city,
-                        zipCode = each.zipCode,
-                        stateName = each.stateName,
-                        type = new TypeDTO { key = (each.refTermId).ToString().ToUpper() },
-                        country = new TypeDTO { key = (each.country).ToString().ToUpper() },
+                        Line1 = each.Line1,
+                        Line2 = each.Line2,
+                        City = each.City,
+                        Zipcode = each.Zipcode,
+                        StateName = each.StateName,
+                        Type = new TypeDTO { Key = (each.RefTermId).ToString().ToUpper() },
+                        Country = new TypeDTO { Key = (each.Country).ToString().ToUpper() },
                     };
                     string josnObj = JsonConvert.SerializeObject(addressObj);
-                    bool isNewAddress = id != Guid.Empty ? id != each.userId : true;
+                    bool isNewAddress = id != Guid.Empty ? id != each.UserId : true;
                     if (josnObj == josnObjj && isNewAddress)
                     {
                         return josnObj;
@@ -223,7 +224,7 @@ namespace AddressBookAPI.Repository
         /// Delets addressBook from database
         ///</summary>
         ///<param name="account"></param>
-        public void RemoveAccount(user account)
+        public void RemoveAccount(User account)
         {
           
              _context.Remove(account);
@@ -235,7 +236,7 @@ namespace AddressBookAPI.Repository
         /// saves AdderssBoook to database
         ///</summary>
         ///<param name="account"></param>
-        public void  SaveToDataBase(user account)
+        public void  SaveToDataBase(User account)
         {
             _context.Add(account);
             _context.SaveChanges();
@@ -245,7 +246,7 @@ namespace AddressBookAPI.Repository
         /// saves file to database
         ///</summary>
         ///<param name="fileObj"></param>
-        public void SaveFileToDataBase(asset fileObj)
+        public void SaveFileToDataBase(Asset fileObj)
         {      
             _context.Add(fileObj);
             _context.SaveChanges();       
@@ -258,7 +259,7 @@ namespace AddressBookAPI.Repository
         ///<returns>string<refTerm></returns>
         public string GetType(Guid id)
         {
-            return _context.RefTerm.Where(w => w.Id ==id).Select(s => s.key).FirstOrDefault();
+            return _context.RefTerm.Where(wrt => wrt.Id ==id).Select(src => src.Key).FirstOrDefault();
           
         }
 
@@ -270,7 +271,7 @@ namespace AddressBookAPI.Repository
         ///<returns>byte[]<refTerm></returns>
         public byte[] GetFile(Guid id)
         {
-            return _context.AssetDTO.Where(f => f.Id == id).Select(s => s.field).FirstOrDefault();
+            return _context.AssetDTO.Where(fnd => fnd.Id == id).Select(src => src.Field).FirstOrDefault();
         }
 
         //
@@ -278,7 +279,7 @@ namespace AddressBookAPI.Repository
         ///saves new Admin login details into database
         ///</summary>
         ///<param name="sinupModel"></param>
-        public void SinupAdmin(login sinupModel)
+        public void SinupAdmin(Login sinupModel)
         {
              _context.Add(sinupModel);
             _context.SaveChanges();   

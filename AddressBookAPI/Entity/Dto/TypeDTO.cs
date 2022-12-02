@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace AddressBookAPI.Entity.Dto
         [Required]
         [MaxLength(36,ErrorMessage ="Enter Valid Guid")]
         [MinLength(36, ErrorMessage = "Enter Valid Guid")]
-        public string key { get; set; }
+        [JsonProperty(PropertyName = "key")]
+        public string Key { get; set; }
     }
 }

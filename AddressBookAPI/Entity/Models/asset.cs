@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Entity.Models
 {
-    public class asset
+    public class Asset
     {
        public Guid Id { get; set; }
-        
-       public byte[] field { get; set; }
+
+        ///<summary>
+        /// binary data of the profile pic of user
+        ///</summary>
+        public byte[] Field { get; set; }
     }
 }

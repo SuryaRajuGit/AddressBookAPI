@@ -5,12 +5,18 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Entity.Models
 {
-    public class refSet
+    public class RefSet
     {
         public Guid Id { get; set; }
 
-        public string key { get; set; }
+        ///<summary>
+        /// refset key
+        ///</summary>
+        public string Key { get; set; }
 
-        public string description { get; set; }
+        ///<summary>
+        /// description of the refset key 
+        ///</summary>
+        public string Description { get; set; }
     }
 }

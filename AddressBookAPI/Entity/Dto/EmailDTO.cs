@@ -14,10 +14,11 @@ namespace AddressBookAPI.Entity.Dto
         [Required]
         [JsonProperty(PropertyName = "email_address")]
         [RegularExpression(@"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", ErrorMessage = "Enter Valid email address")]
-        public string emailAddress { get; set; }
+        public string EmailAddress { get; set; }
 
         [Required]
-        public TypeDTO type { get; set; }
+        [JsonProperty(PropertyName = "type")]
+        public TypeDTO Type { get; set; }
  
     }
 }

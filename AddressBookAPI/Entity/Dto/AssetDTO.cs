@@ -11,11 +11,12 @@ namespace AddressBookAPI.Entity.Dto
         public Guid Id { get; set; }
 
         [JsonProperty(PropertyName = "file_name")]
-        public string fileName { get; set; }
+        public string FileName { get; set; }
 
-        public byte[] file { get; set; }
+        [JsonProperty(PropertyName = "file")]
+        public byte[] File { get; set; }
 
-        public Guid userId { get; set; }
+        public Guid UserId { get; set; }
         
     }
 }

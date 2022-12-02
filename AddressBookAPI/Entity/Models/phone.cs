@@ -7,16 +7,22 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Entity.Models
 {
-    public class phone
+    public class Phone
     {
         public int Id { get; set; }
 
-        public string phoneNumber { get; set; }
+        ///<summary>
+        /// phone number of the user
+        ///</summary>
+        public string PhoneNumber { get; set; }
+    
+        public Guid UserId { get; set; }
+        public User User { get; set; }
 
-        public Guid userId { get; set; }
-        public user user { get; set; }
-
-        public Guid refTermId { get; set; }
-        public refTerm refTerm { get; set; }
+        ///<summary>
+        /// type of phone number  
+        ///</summary>
+        public Guid RefTermId { get; set; }
+        public RefTerm RefTerm { get; set; }
     }
 }

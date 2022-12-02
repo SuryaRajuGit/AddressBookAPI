@@ -17,23 +17,23 @@ namespace AddressBookAPI.Entity.Models
             
         }
 
-        public DbSet<address> Address { get; set; }
+        public DbSet<Address> Address { get; set; }
 
-        public DbSet<email> Email { get; set; }
+        public DbSet<Email> Email { get; set; }
 
-        public DbSet<phone> Phone { get; set; }
+        public DbSet<Phone> Phone { get; set; }
 
-        public DbSet<refSet> RefSet { get; set; }
+        public DbSet<RefSet> RefSet { get; set; }
 
-        public DbSet<refTerm> RefTerm { get; set; }
+        public DbSet<RefTerm> RefTerm { get; set; }
 
-        public DbSet<setRefTerm> SetRefTerm { get; set; }
+        public DbSet<SetRefTerm> SetRefTerm { get; set; }
 
-        public DbSet<asset> AssetDTO { get; set; }
+        public DbSet<Asset> AssetDTO { get; set; }
 
-        public DbSet<user> User { get; set; }
+        public DbSet<User> User { get; set; }
 
-        public DbSet<login> Login { get; set; }
+        public DbSet<Login> Login { get; set; }
 
 
 
@@ -43,14 +43,14 @@ namespace AddressBookAPI.Entity.Models
             string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\Book1.csv";
             string ReadCSV = File.ReadAllText(path);
             var data = ReadCSV.Split('\r');
-            var list = new List<refTerm>();
+            var list = new List<RefTerm>();
             foreach (var item in data)
             {
                 string[] row = item.Split(",");
-                refTerm refObj = new refTerm { Id = Guid.Parse(row[0]), key = row[1].ToString(), description = row[2].ToString() };
+                RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString() };
                 list.Add(refObj);
             }
-            modelBuilder.Entity<refTerm>()
+            modelBuilder.Entity<RefTerm>()
             .HasData(list);
 
             string path1 = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\TextFile.csv";
@@ -58,54 +58,54 @@ namespace AddressBookAPI.Entity.Models
             string[] data1 = ReadCsv.Split('\r');
             Guid id = Guid.NewGuid();
        
-            modelBuilder.Entity<phone>()
-                  .HasOne(e => e.user)
-                  .WithMany(s => s.phone)
-                  .HasForeignKey(s => s.userId);
+            modelBuilder.Entity<Phone>()
+                  .HasOne(e => e.User)
+                  .WithMany(s => s.Phone)
+                  .HasForeignKey(s => s.UserId);
             int count = 0;
             foreach (var item in data1)
             {
                 string[] row = item.Split(",");
                 id = Guid.NewGuid();
-                user user1 = new user()
+                User user1 = new User()
                 {
                     Id = id,
-                    firstName = row[0].ToString(),
-                    lastName = row[1].ToString()
+                    FirstName = row[0].ToString(),
+                    LastName = row[1].ToString()
                 };
 
-                phone phone1 = new phone()
+                Phone phone1 = new Phone()
                 {
                     Id = count + 1,
-                    phoneNumber = row[11].ToString(),
-                    userId = id,
-                    refTermId = Guid.Parse(row[12])
+                    PhoneNumber = row[11].ToString(),
+                    UserId = id,
+                    RefTermId = Guid.Parse(row[12])
                 };
-                email email1 = new email()
+                Email email1 = new Email()
                 {
                     Id = count + 1,
-                    emailAddress = row[9].ToString(),
-                    refTermId = Guid.Parse(row[10]),
-                    userId = id,
+                    EmailAddress = row[9].ToString(),
+                    RefTermId = Guid.Parse(row[10]),
+                    UserId = id,
 
                 };
-                address address1 = new address()
+                Address address1 = new Address()
                 {
                     Id = count + 1,
-                    line1 = row[2].ToString(),
-                    line2 = row[3].ToString(),
-                    city = row[4].ToString(),
-                    zipCode = row[5].ToString(),
-                    stateName = row[6].ToString(),
-                    country = Guid.Parse(row[7]),
-                    refTermId = Guid.Parse(row[8]),
-                    userId = id,
+                    Line1 = row[2].ToString(),
+                    Line2 = row[3].ToString(),
+                    City = row[4].ToString(),
+                    Zipcode = row[5].ToString(),
+                    StateName = row[6].ToString(),
+                    Country = Guid.Parse(row[7]),
+                    RefTermId = Guid.Parse(row[8]),
+                    UserId = id,
 
                 };
-                modelBuilder.Entity<user>().HasData(user1);
-                modelBuilder.Entity<phone>().HasData(phone1);
-                modelBuilder.Entity<email>().HasData(email1);
-                modelBuilder.Entity<address>().HasData(address1);
+                modelBuilder.Entity<User>().HasData(user1);
+                modelBuilder.Entity<Phone>().HasData(phone1);
+                modelBuilder.Entity<Email>().HasData(email1);
+                modelBuilder.Entity<Address>().HasData(address1);
             }
 
 
@@ -117,35 +117,35 @@ namespace AddressBookAPI.Entity.Models
             {
                 string[] row = item.Split(",");
 
-                refSet refSet1 = new refSet()
+                RefSet refSet1 = new RefSet()
                 {
                     Id = Guid.Parse(row[0]),
-                    key = row[1],
-                    description = row[2]
+                    Key = row[1],
+                    Description = row[2]
                 };
 
-                modelBuilder.Entity<refSet>().HasData(refSet1);
+                modelBuilder.Entity<RefSet>().HasData(refSet1);
             }
 
             string path3 = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\refSetTerm.csv";
             string ReadCsvRefSetTerm = File.ReadAllText(path3);
             string[] dataRefSetTerm = ReadCsvRefSetTerm.Split('\r');
 
-            List<setRefTerm> ll = new List<setRefTerm>();
+            List<SetRefTerm> ll = new List<SetRefTerm>();
             foreach (var item in dataRefSetTerm)
             {
                 string[] row = item.Split(",");
 
-                setRefTerm setRefTerm1 = new setRefTerm()
+                SetRefTerm setRefTerm1 = new SetRefTerm()
                 {
                     Id = Guid.NewGuid(),
-                    refSetId = Guid.Parse(row[0]),
-                    refTermId = Guid.Parse(row[1]),
+                    RefSetId = Guid.Parse(row[0]),
+                    RefTermId = Guid.Parse(row[1]),
                 };
                 ll.Add(setRefTerm1);
 
             }
-            modelBuilder.Entity<setRefTerm>().HasData(ll);
+            modelBuilder.Entity<SetRefTerm>().HasData(ll);
         }
 
 

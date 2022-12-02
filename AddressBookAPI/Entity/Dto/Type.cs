@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AddressBookAPI.Entity.Dto
 {
-    public class type
+    public class Type
     {
-        public Guid key { get; set; }
+        [JsonProperty(PropertyName = "key")]
+        public Guid Key { get; set; }
     }
 }

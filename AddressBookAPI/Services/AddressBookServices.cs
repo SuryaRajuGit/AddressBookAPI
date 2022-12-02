@@ -50,10 +50,10 @@ namespace AddressBookAPI.Services
         ///</summary>
         ///<param name="logInDTO">Guid of file ></param>
         ///<returns>logInResponseDTO</returns>
-        public logInResponseDTO VerifyUser(LogInDTO logInDTO)
+        public LogInResponseDTO VerifyUser(LogInDTO logInDTO)
         {
             //takes Args login userName string,returns string ,checks the userName exists in the database
-            string userPassword = _addressBookRepository.loginDetails(logInDTO.userName);
+            string userPassword = _addressBookRepository.loginDetails(logInDTO.UserName);
             if (userPassword == null)
             {
                 return null;
@@ -67,7 +67,7 @@ namespace AddressBookAPI.Services
             string password = Encoding.Unicode.GetString(outputBuffer);
 
 
-            if (password == logInDTO.password)
+            if (password == logInDTO.Password)
             {
                 JwtSecurityTokenHandler tokenhandler = new JwtSecurityTokenHandler();
                 byte[] tokenKey = Encoding.UTF8.GetBytes(Constants.secutityKey);
@@ -77,7 +77,7 @@ namespace AddressBookAPI.Services
                     Subject = new System.Security.Claims.ClaimsIdentity(
                         new Claim[]
                         {
-                            new Claim(ClaimTypes.Name, logInDTO.userName) }
+                            new Claim(ClaimTypes.Name, logInDTO.UserName) }
                         ),
                     Expires = DateTime.UtcNow.AddMinutes(30),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
@@ -85,10 +85,10 @@ namespace AddressBookAPI.Services
 
                 SecurityToken token = tokenhandler.CreateToken(tokenDeprictor);
                 string tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-                logInResponseDTO response = new logInResponseDTO()
+                LogInResponseDTO response = new LogInResponseDTO()
                 {
-                    jwt = tokenString,
-                    type = "Bearer"
+                    AccessToken = tokenString,
+                    TokenType = Constants.Bearer
                 };
                 return response;
             }
@@ -105,11 +105,11 @@ namespace AddressBookAPI.Services
         ///<param name="sortBy">sort by fist name or lastname of file ></param>
         ///<param name="sortOrder">sort by ascending or descending  of file ></param>
         ///<returns>list of AddressBooks</returns>
-        public List<UserDTO> GetAllAddressBooks(int size, int pageNo, string sortBy, string sortOrder)
+        public List<UserDTO> GetAllAddressBooks(int size , int pageNo , string sortBy , string sortOrder )
         {
             // takes Args size Int,pageNo Int ,returns list of AddressBooks after applying pagenation
-            List<user> paginatedList = _addressBookRepository.Pageination(size, pageNo);
-            IEnumerable<user> sortList;
+            List<User> paginatedList = _addressBookRepository.GetPageinatedList(size, pageNo);
+            IEnumerable<User> sortList;
             if (paginatedList == null)
             {
                 return null;
@@ -117,22 +117,22 @@ namespace AddressBookAPI.Services
             
             if (sortOrder == Constants.DSC)
             {
-                sortList = sortBy == Constants.firstName ? paginatedList.OrderBy(s => s.firstName) : paginatedList.OrderBy(s => s.lastName);
-                sortList = sortBy == Constants.firstName ? sortList.OrderByDescending(s => s.firstName) : sortList.OrderByDescending(s => s.lastName);
+                sortList = sortBy == Constants.firstName ? paginatedList.OrderBy(item => item.FirstName) : paginatedList.OrderBy(item => item.FirstName);
+                sortList = sortBy == Constants.firstName ? sortList.OrderByDescending(item => item.FirstName) : sortList.OrderByDescending(item => item.LastName);
                   
             }
             else
             {
-                sortList = sortBy == Constants.firstName ? paginatedList.OrderBy(s => s.firstName) : paginatedList.OrderBy(s => s.lastName);
+                sortList = sortBy == Constants.firstName ? paginatedList.OrderBy(item => item.FirstName) : paginatedList.OrderBy(item => item.LastName);
             }
 
             List<UserDTO> accountsList = new List<UserDTO>();
-            foreach (user i in sortList)
+            foreach (User i in sortList)
             {
                 UserDTO user = _mapper.Map<UserDTO>(i);
 
                
-                foreach (string item in user.Email.Select(s => s.type.key))
+                foreach (string item in user.Email.Select(s => s.Type.Key))
                 {
                     Guid sample;
                     if (!Guid.TryParse(item, out sample))
@@ -140,9 +140,9 @@ namespace AddressBookAPI.Services
                         break;
                     }
                     string type = _addressBookRepository.GetType(sample);
-                    user.Email.Where(s => s.type.key == item).Select(c => { c.type.key = type; return c; }).ToList();
+                    user.Email.Where(s => s.Type.Key == item).Select(src => { src.Type.Key = type; return src; }).ToList();
                 }
-                foreach (string item in user.Phone.Select(s => s.type.key))
+                foreach (string item in user.Phone.Select(src => src.Type.Key))
                 {
                     Guid sample;
                     if (!Guid.TryParse(item, out sample))
@@ -150,15 +150,15 @@ namespace AddressBookAPI.Services
                         break;
                     }
                     string type = _addressBookRepository.GetType(sample);
-                    user.Phone.Where(s => s.type.key == item).Select(c => { c.type.key = type; return c; }).ToList();
+                    user.Phone.Where(src => src.Type.Key == item).Select(crc => { crc.Type.Key = type; return crc; }).ToList();
                 }
-                Guid countryKey = Guid.Parse(user.Address.Select(s => s.country.key).FirstOrDefault());
+                Guid countryKey = Guid.Parse(user.Address.Select(src => src.Country.Key).FirstOrDefault());
                 string getCountryType = _addressBookRepository.GetType(countryKey);
-                user.Address.Select(c => c.country).Select(s => { s.key = getCountryType; return s; }).ToList();
+                user.Address.Select(crc => crc.Country).Select(src => { src.Key = getCountryType; return src; }).ToList();
 
-                Guid addressKey = Guid.Parse(user.Address.Select(s => s.type.key).FirstOrDefault());
+                Guid addressKey = Guid.Parse(user.Address.Select(s => s.Type.Key).FirstOrDefault());
                 string addressType = _addressBookRepository.GetType(addressKey);
-                user.Address.Select(c => c.type).Select(s => { s.key = addressType; return s; }).ToList();
+                user.Address.Select(crc => crc.Type).Select(src => { src.Key = addressType; return src; }).ToList();
                 accountsList.Add(user);
                 
             }
@@ -170,20 +170,20 @@ namespace AddressBookAPI.Services
         ///</summary>
         ///<param name="emailDTOs"></param>
         ///<returns>bool value</returns>
-        public bool isMatched(ICollection<EmailDTO> emailDTOs)
+        public bool IsEmailMatched(ICollection<EmailDTO> emailDTOs)
         {
             HashSet<Guid> emialTypeHashSet = new HashSet<Guid>();
             HashSet<string> emialHashSet = new HashSet<string>();
             foreach (EmailDTO item in emailDTOs.Select(s => s))
             {
-                emialTypeHashSet.Add(Guid.Parse(item.type.key));
-                emialHashSet.Add(item.emailAddress);
+                emialTypeHashSet.Add(Guid.Parse(item.Type.Key));
+                emialHashSet.Add(item.EmailAddress);
             }
-            if (emialTypeHashSet.Count() != emailDTOs.Select(s => s.type.key).Count())
+            if (emialTypeHashSet.Count() != emailDTOs.Select(src => src.Type.Key).Count())
             {
-                if (emialHashSet.Count() != emailDTOs.Select(s => s.emailAddress).Count())
+                if (emialHashSet.Count() != emailDTOs.Select(src => src.EmailAddress).Count())
                 {
-                    return true;//new ErrorDTO { type = "Conflict", description = "both entered Emails are same" };
+                    return true;
                 }
 
             }
@@ -196,18 +196,18 @@ namespace AddressBookAPI.Services
         ///</summary>
         ///<param name="phoneDTOs"></param>
         ///<returns>bool value</returns>
-        public bool isMatchedphone(ICollection<PhoneDTO> phoneDTOs)
+        public bool IsPhoneMatched(ICollection<PhoneDTO> phoneDTOs)
         {
             HashSet<Guid> phoneTypeHashSet = new HashSet<Guid>();
             HashSet<string> phoneHashSet = new HashSet<string>();
             foreach (PhoneDTO item in phoneDTOs.Select(s => s))
             {
-                phoneTypeHashSet.Add(Guid.Parse(item.type.key));
-                phoneHashSet.Add(item.phoneNumber);
+                phoneTypeHashSet.Add(Guid.Parse(item.Type.Key));
+                phoneHashSet.Add(item.PhoneNumber);
             }
-            if (phoneTypeHashSet.Count() != phoneDTOs.Select(s => s.type.key).Count())
+            if (phoneTypeHashSet.Count() != phoneDTOs.Select(src => src.Type.Key).Count())
             {
-                if (phoneHashSet.Count() != phoneDTOs.Select(s => s.phoneNumber).Count())
+                if (phoneHashSet.Count() != phoneDTOs.Select(src => src.PhoneNumber).Count())
                 {
                     return true;
                 }
@@ -216,7 +216,6 @@ namespace AddressBookAPI.Services
             return false;
 
         }
-
 
         ///<summary>
         ///updates existing  AddressBook based on userId
@@ -227,37 +226,43 @@ namespace AddressBookAPI.Services
         public ErrorDTO?  UpdateAddressBook(Guid id, UserDTO userDTO)
         {
             //takes Args Guid ,returns user Dto,gets addressbook from database using userId.
-            user account = _addressBookRepository.GetAccount(id, userDTO);
-            if(account == null)
+            User account = _addressBookRepository.GetAccount(id, userDTO);
+            if (account == null)
             {
                 return new ErrorDTO { type = "AddressBook", description = "AddressBook not found " };
             }
+            bool isCountryExists = _addressBookRepository.IsCountryExixsted(userDTO.Address.Select(s => s.Country.Key).First());
+            if (!isCountryExists)
+            {
+                return new ErrorDTO { type = "meta-data", description = "Meta-data not found" };
+            }
+            
             try
             {
-                account.firstName = userDTO.firstName;
-            account.lastName = userDTO.lastName;
-            account.email = userDTO.Email.Select(s => new email
+                account.FirstName = userDTO.FirstName;
+            account.LastName = userDTO.LastName;
+            account.Email = userDTO.Email.Select(src => new Email
             {
-                emailAddress = s.emailAddress,
-                refTermId = Guid.Parse(s.type.key),
+                EmailAddress = src.EmailAddress,
+                RefTermId = Guid.Parse(src.Type.Key),
             }).ToList();
 
 
-            account.address = userDTO.Address.Select(s => new address
+            account.Address = userDTO.Address.Select(src => new Address
             {
-                refTermId = Guid.Parse(s.type.key),
-                line1 = s.line1,
-                line2 = s.line2,
-                stateName = s.stateName,
-                city = s.city,
-                zipCode = s.zipCode,
-                country = Guid.Parse(s.country.key),
+                RefTermId = Guid.Parse(src.Type.Key),
+                Line1 = src.Line1,
+                Line2 = src.Line2,
+                StateName = src.StateName,
+                City = src.City,
+                Zipcode = src.Zipcode,
+                Country = Guid.Parse(src.Country.Key),
             }).ToList();
-            account.phone = userDTO.Phone.Select(s =>
-                new phone
+            account.Phone = userDTO.Phone.Select(src =>
+                new Phone
                 {
-                    refTermId = Guid.Parse(s.type.key),
-                    phoneNumber = s.phoneNumber
+                    RefTermId = Guid.Parse(src.Type.Key),
+                    PhoneNumber = src.PhoneNumber
                 }).ToList().ToList();
 
             
@@ -275,12 +280,12 @@ namespace AddressBookAPI.Services
         ///</summary>
         ///<param name="ModelState"></param>
         ///<returns>ErrorDTO</returns>
-        public ErrorDTO modelStateInvaliLoginAPI(ModelStateDictionary ModelState)
+        public ErrorDTO ModelStateInvaliLoginAPI(ModelStateDictionary ModelState)
         {
             return new ErrorDTO
             {
-                type = ModelState.Keys.Select(s => s).FirstOrDefault(),
-                description = ModelState.Values.Select(s => s.Errors[0].ErrorMessage).FirstOrDefault()
+                type = ModelState.Keys.Select(src => src).FirstOrDefault(),
+                description = ModelState.Values.Select(src => src.Errors[0].ErrorMessage).FirstOrDefault()
             };
         }
         // 
@@ -289,13 +294,13 @@ namespace AddressBookAPI.Services
         ///</summary>
         ///<param name="ModelState"></param>
         ///<returns>ErrorDTO</returns>
-        public ErrorDTO modelStateInvalidSinupAPI(ModelStateDictionary ModelState)
+        public ErrorDTO ModelStateInvalidSinupAPI(ModelStateDictionary ModelState)
         {
             return new ErrorDTO
             {
                 type = ModelState.Keys.FirstOrDefault(),
                 description =
-                ModelState.Values.Select(s => s.Errors.Select(s => s.ErrorMessage).FirstOrDefault()).FirstOrDefault()
+                ModelState.Values.Select(src => src.Errors.Select(src => src.ErrorMessage).FirstOrDefault()).FirstOrDefault()
             };
         }
         // 
@@ -311,23 +316,16 @@ namespace AddressBookAPI.Services
         // Checks email exists in the database and return string 
         public ErrorDTO EmailExists(ICollection<EmailDTO> email, Guid id)
         {
-            try
-            {
-                bool isEmailDup = isMatched(email);
+           
+                bool isEmailDup = IsEmailMatched(email);
                 if(isEmailDup)
                 {
                     return  new ErrorDTO { type = "email", description = "both entered Emails are same" };
                 }
 
-            }
-            catch
-            {
-                return new ErrorDTO { type = "meta-data", description = "meat-data not exists in database" };
-            }
-
             //takes Args email ICollection<EmailDTO> , returns string , checks emails exist in the database
-           string isEmailExists = _addressBookRepository.EmailList(email,id);
-            if(isEmailExists != null)
+        string isEmailExists = _addressBookRepository.EmailList(email,id);
+        if(isEmailExists != null)
             {
                 return new ErrorDTO
                 {
@@ -348,18 +346,13 @@ namespace AddressBookAPI.Services
         ///<returns>ErrorDTO</returns>
         public ErrorDTO PhoneExists(ICollection<PhoneDTO> phone,Guid id)
         {
-            try
-            {
-                bool isPhoneDup = isMatchedphone(phone);
+            
+                bool isPhoneDup = IsPhoneMatched(phone);
                 if (isPhoneDup)
                 {
                     return new ErrorDTO { type = "phone", description = "both entered Phone no are same" };
                 }
-            }
-            catch
-            {
-                return  new ErrorDTO{type="meta-data", description = "meta-data do not exist in database"};
-            }
+            
            //  takes Args phone ICollection<PhoneDTO> ,returns string ,checks phone no exist in the database
             string isPhoneExists = _addressBookRepository.PhoneList(phone,id);
             if (isPhoneExists != null)
@@ -379,22 +372,22 @@ namespace AddressBookAPI.Services
         ///</summary>
         ///<param name="key"></param>
         ///<returns>ErrorDTO</returns>
-        public List<RefSetResponseDto> getRefSetData(string key)
+        public List<RefSetResponseDto> GetRefSetData(string key)
         {
 
-            List<refTerm> refTermList = _addressBookRepository.getRefSetData(key);
+            List<RefTerm> refTermList = _addressBookRepository.GetRefSetData(key);
             if(refTermList == null)
             {
                 return null;
             }
             List<RefSetResponseDto> responseList = new List<RefSetResponseDto>();
-            foreach (refTerm item in refTermList)
+            foreach (RefTerm item in refTermList)
             {
                 RefSetResponseDto response = new RefSetResponseDto
                 {
                     id = item.Id,
-                    key = item.key,
-                    description = item.description
+                    Key = item.Key,
+                    Description = item.Description
                 };
                 responseList.Add(response);
             }
@@ -406,14 +399,14 @@ namespace AddressBookAPI.Services
         ///</summary>
         ///<param name="modelState"></param>
         ///<returns>ErrorDTO</returns>
-        public ErrorDTO modelStateInvalid(ModelStateDictionary modelState)
+        public ErrorDTO ModelStateInvalid(ModelStateDictionary modelState)
         {
             return new ErrorDTO
             {
-                type = modelState.Select(s => s).Where(s => s.Value.ValidationState.ToString() == Constants.invalid).Select(s => s.Key).FirstOrDefault(),
+                type = modelState.Select(src => src).Where(src => src.Value.ValidationState.ToString() == Constants.invalid).Select(src => src.Key).FirstOrDefault(),
                 
-                description = modelState.Values.Where(w => w.ValidationState.ToString() == Constants.invalid).
-                Select(s => s.Errors[0].ErrorMessage).FirstOrDefault()
+                description = modelState.Values.Where(wre => wre.ValidationState.ToString() == Constants.invalid).
+                Select(src => src.Errors[0].ErrorMessage).FirstOrDefault()
             
             };
         }
@@ -449,44 +442,49 @@ namespace AddressBookAPI.Services
         ///</summary>
         ///<param name="userDTO"></param>
         ///<returns>Guid</returns>
-        public Guid? saveToDatabase(UserDTO userDTO)
+        public Guid? SaveToDatabase(UserDTO userDTO)
         {
             Guid newId = Guid.NewGuid();
+            bool isCountryExists = _addressBookRepository.IsCountryExixsted(userDTO.Address.Select(src => src.Country.Key).First());
+            if(!isCountryExists)
+            {
+                return null;
+            }
             try
             {
-                user user = new user()
-            {
+                User user = new User()
+                {
                 Id = newId,
-                firstName = userDTO.firstName,
-                lastName = userDTO.lastName,
+                FirstName = userDTO.FirstName,
+                LastName = userDTO.LastName,
 
-                email = userDTO.Email.Select(s =>
-                   new email
+                Email = userDTO.Email.Select(src =>
+                   new Email
                    {
-                       emailAddress = s.emailAddress,
-                       userId = newId,
-                       refTermId = Guid.Parse(s.type.key),
+                       EmailAddress = src.EmailAddress,
+                       UserId = newId,
+                       RefTermId = Guid.Parse(src.Type.Key),
                    }).ToList(),
 
-                address = userDTO.Address.Select(s =>
-                new address
+                Address = userDTO.Address.Select(src =>
+                new Address
                 {
-                    line1 = s.line1,
-                    line2 = s.line2,
-                    country =  Guid.Parse(s.country.key),
-                    userId = newId,
-                    refTermId = Guid.Parse(s.type.key),
-                    stateName = s.stateName,
-                    city = s.city,
-                    zipCode = s.zipCode
+                    Line1 = src.Line1,
+                    Line2 = src.Line2,
+                    Country =  Guid.Parse(src.Country.Key),
+                    UserId = newId,
+                    RefTermId = Guid.Parse(src.Type.Key),
+                    StateName = src.StateName,
+                    City = src.City,
+                    Zipcode = src.Zipcode
                 }).ToList(),
 
-                phone = userDTO.Phone.Select(s =>
-                new phone
+                Phone = userDTO.Phone.Select(src =>
+                new Phone
                 {
-                    refTermId = Guid.Parse(s.type.key),
-                    userId = newId,
-                    phoneNumber = s.phoneNumber
+                    RefTermId = Guid.Parse(src.Type.Key),
+                    UserId = newId,
+                    PhoneNumber = src.PhoneNumber
                 }).ToList()
             };
             
@@ -510,14 +508,14 @@ namespace AddressBookAPI.Services
         public string  DeletAddressBook(Guid id)
         {
             //takes Args id Guid ,returns user Dto,checks the addressbook exists in the database
-            user account = _addressBookRepository.GetAddressbook(id);
+            User account = _addressBookRepository.GetAddressbook(id);
             if (account == null)
             {
                 return null;
             }
             //takes account Dto,removes the addressBook from database
             _addressBookRepository.RemoveAccount(account);
-            return "";
+            return string.Empty;
         }
 
         //
@@ -531,10 +529,10 @@ namespace AddressBookAPI.Services
             MemoryStream ms = new MemoryStream();
             file.CopyTo(ms);
             byte[] bytes = ms.ToArray();
-            asset fileObj = new asset()
+            Asset fileObj = new Asset()
             {
                 Id = Guid.NewGuid(),
-                field = bytes,
+                Field = bytes,
             };
             string addresses = _server.Features.Get<IServerAddressesFeature>().Addresses.FirstOrDefault();
             UploadResponseDTO response = new UploadResponseDTO
@@ -578,7 +576,7 @@ namespace AddressBookAPI.Services
         public UserDTO GetAddressBook(Guid id)
         {
             // takes Args id Guid ,returns user Model ,gets user model from database using id.
-            user account =  _addressBookRepository.GetAddressbook(id);
+            User account =  _addressBookRepository.GetAddressbook(id);
             if (account == null)
             {
                 return null;
@@ -586,7 +584,7 @@ namespace AddressBookAPI.Services
             
             UserDTO addressBook = _mapper.Map<UserDTO>(account);
             UserDTO addressBookObj = addressBook;
-            foreach (string item in addressBook.Email.Select(s => s.type.key))
+            foreach (string item in addressBook.Email.Select(s => s.Type.Key))
             {
                 Guid sample;
                 if (!Guid.TryParse(item, out sample))
@@ -594,9 +592,9 @@ namespace AddressBookAPI.Services
                     break;
                 }
                 string type = _addressBookRepository.GetType(sample);
-                addressBookObj.Email.Where(s => s.type.key == item).Select(c => { c.type.key = type; return c; }).ToList();
+                addressBookObj.Email.Where(src => src.Type.Key == item).Select(crt => { crt.Type.Key = type; return crt; }).ToList();
             }
-            foreach (string item in addressBook.Phone.Select(s => s.type.key))
+            foreach (string item in addressBook.Phone.Select(s => s.Type.Key))
             {
                 Guid sample;
                 if (!Guid.TryParse(item, out sample))
@@ -604,15 +602,15 @@ namespace AddressBookAPI.Services
                     break;
                 }
                 string type = _addressBookRepository.GetType(Guid.Parse(item));
-                addressBookObj.Phone.Where(s => s.type.key == item).Select(c => { c.type.key = type; return c; }).ToList();
+                addressBookObj.Phone.Where(src => src.Type.Key == item).Select(crt => { crt.Type.Key = type; return crt; }).ToList();
             }
-            Guid countryKey = Guid.Parse(addressBook.Address.Select(s => s.country.key).FirstOrDefault());
+            Guid countryKey = Guid.Parse(addressBook.Address.Select(s => s.Country.Key).FirstOrDefault());
             string getCountryType = _addressBookRepository.GetType(countryKey);
-            addressBookObj.Address.Select(c => c.country).Select(s => { s.key = getCountryType; return s; }).ToList();
+            addressBookObj.Address.Select(crt => crt.Country).Select(src => { src.Key = getCountryType; return src; }).ToList();
 
-            Guid addressKey = Guid.Parse(addressBook.Address.Select(s => s.type.key).FirstOrDefault());
+            Guid addressKey = Guid.Parse(addressBook.Address.Select(src => src.Type.Key).FirstOrDefault());
             string addressType = _addressBookRepository.GetType(addressKey);
-            addressBookObj.Address.Select(c => c.type).Select(s => { s.key = addressType; return s; }).ToList();
+            addressBookObj.Address.Select(crt => crt.Type).Select(src => { src.Key = addressType; return src; }).ToList();
             return addressBookObj;
         }
 
@@ -624,9 +622,9 @@ namespace AddressBookAPI.Services
         ///<returns>string</returns>
         public string SignupAdmin(SignupDTO signupDTO)
         {
-            string text = signupDTO.password;
+            string text = signupDTO.Password;
             // takes Args new login userName string ,return bool ,checks username exists in database
-            bool isExists = _addressBookRepository.isUserNameExists(signupDTO.userName);
+            bool isExists = _addressBookRepository.IsUserNameExists(signupDTO.UserName);
             if (isExists)
             {
                 return null;
@@ -636,9 +634,9 @@ namespace AddressBookAPI.Services
             byte[] inputbuffer = Encoding.Unicode.GetBytes(text);
             byte[] outputBuffer = transform.TransformFinalBlock(inputbuffer, 0, inputbuffer.Length);
             string password = Convert.ToBase64String(outputBuffer);
-            login loginObj = new login { userName = signupDTO.userName, password = password };
+            Login loginObj = new Login { UserName = signupDTO.UserName, Password = password };
             _addressBookRepository.SinupAdmin(loginObj);
-            return "";
+            return string.Empty;
 
         }
     }

@@ -17,6 +17,8 @@ namespace AddressBookAPI.Entity.Dto
 
         public const string DSC = "DSC";
 
+        public const string ASC = "ASC";
+
         public const string invalid = "Invalid";
 
         public const string Valid = "Valid";
@@ -26,21 +28,18 @@ namespace AddressBookAPI.Entity.Dto
         public const string ConetentType = "image/jpeg";
 
         public const string file = "response.jpg";
-        //public enum Constants {
-        //    firstName,
-        //    lastName,
-        //    one = 1,
-        //    phone,
-        //    email,
-        //    address,
-        //    upperCase,
-        //    space,
-        //    length,
-        //    DSC
 
-        //    ,
-        //    specialCharacter }
+        public const string Bearer = "Bearer";
 
+        public const int pageSize = 5;
+
+        public const int pageNo = 1;
+
+        public const string pageno = "page-no";
+
+        public const string sortby = "sort-by";
+
+        public const string sortorder = "sort-order";
 
     }
     

@@ -13,7 +13,7 @@ namespace AddressBookAPI.Services
 {
     public interface IAddressBookServices
     {
-        public logInResponseDTO VerifyUser(LogInDTO logInDTO); 
+        public LogInResponseDTO VerifyUser(LogInDTO logInDTO); 
 
         public int GetAddressBookCount();
 
@@ -21,14 +21,13 @@ namespace AddressBookAPI.Services
 
         public ErrorDTO UpdateAddressBook(Guid id, UserDTO userDTO);
 
-
         public List<UserDTO> GetAllAddressBooks(int size, int pageNo, string sortBy, string sortOrder);
 
-        public ErrorDTO modelStateInvalid(ModelStateDictionary ModelState);
+        public ErrorDTO ModelStateInvalid(ModelStateDictionary ModelState);
 
-        public ErrorDTO modelStateInvalidSinupAPI(ModelStateDictionary ModelState);
+        public ErrorDTO ModelStateInvalidSinupAPI(ModelStateDictionary ModelState);
 
-        public ErrorDTO modelStateInvaliLoginAPI(ModelStateDictionary ModelState);
+        public ErrorDTO ModelStateInvaliLoginAPI(ModelStateDictionary ModelState);
 
         public UserDTO GetAddressBook(Guid id);
 
@@ -38,9 +37,9 @@ namespace AddressBookAPI.Services
 
         public  string SignupAdmin(SignupDTO signupDTO);
 
-        public Guid? saveToDatabase(UserDTO userDTO);
+        public Guid? SaveToDatabase(UserDTO userDTO);
 
-        public List<RefSetResponseDto> getRefSetData(string key);
+        public List<RefSetResponseDto> GetRefSetData(string key);
 
         public ErrorDTO EmailExists(ICollection<EmailDTO> email,Guid id);
 

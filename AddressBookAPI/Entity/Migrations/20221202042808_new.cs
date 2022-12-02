@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AddressBookAPI.Migrations
 {
-    public partial class m1 : Migration
+    public partial class @new : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,8 +13,8 @@ namespace AddressBookAPI.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    userName = table.Column<string>(nullable: true),
-                    password = table.Column<string>(nullable: true)
+                    UserName = table.Column<string>(nullable: true),
+                    Password = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -26,8 +26,8 @@ namespace AddressBookAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    key = table.Column<string>(nullable: true),
-                    description = table.Column<string>(nullable: true)
+                    Key = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -39,8 +39,8 @@ namespace AddressBookAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    key = table.Column<string>(nullable: true),
-                    description = table.Column<string>(nullable: true)
+                    Key = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -52,8 +52,8 @@ namespace AddressBookAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    firstName = table.Column<string>(nullable: true),
-                    lastName = table.Column<string>(nullable: true)
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -65,21 +65,21 @@ namespace AddressBookAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    refSetId = table.Column<Guid>(nullable: false),
-                    refTermId = table.Column<Guid>(nullable: false)
+                    RefSetId = table.Column<Guid>(nullable: false),
+                    RefTermId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SetRefTerm", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SetRefTerm_RefSet_refSetId",
-                        column: x => x.refSetId,
+                        name: "FK_SetRefTerm_RefSet_RefSetId",
+                        column: x => x.RefSetId,
                         principalTable: "RefSet",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SetRefTerm_RefTerm_refTermId",
-                        column: x => x.refTermId,
+                        name: "FK_SetRefTerm_RefTerm_RefTermId",
+                        column: x => x.RefTermId,
                         principalTable: "RefTerm",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -91,27 +91,27 @@ namespace AddressBookAPI.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    line1 = table.Column<string>(nullable: true),
-                    line2 = table.Column<string>(nullable: true),
-                    city = table.Column<string>(nullable: true),
-                    zipCode = table.Column<string>(nullable: true),
-                    stateName = table.Column<string>(nullable: true),
-                    country = table.Column<Guid>(nullable: false),
-                    refTermId = table.Column<Guid>(nullable: false),
-                    userId = table.Column<Guid>(nullable: false)
+                    Line1 = table.Column<string>(nullable: true),
+                    Line2 = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Zipcode = table.Column<string>(nullable: true),
+                    StateName = table.Column<string>(nullable: true),
+                    Country = table.Column<Guid>(nullable: false),
+                    RefTermId = table.Column<Guid>(nullable: false),
+                    UserId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Address", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Address_RefTerm_refTermId",
-                        column: x => x.refTermId,
+                        name: "FK_Address_RefTerm_RefTermId",
+                        column: x => x.RefTermId,
                         principalTable: "RefTerm",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Address_User_userId",
-                        column: x => x.userId,
+                        name: "FK_Address_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -122,15 +122,15 @@ namespace AddressBookAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    field = table.Column<byte[]>(nullable: true),
-                    userId = table.Column<Guid>(nullable: true)
+                    Field = table.Column<byte[]>(nullable: true),
+                    UserId = table.Column<Guid>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AssetDTO", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AssetDTO_User_userId",
-                        column: x => x.userId,
+                        name: "FK_AssetDTO_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -142,22 +142,22 @@ namespace AddressBookAPI.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    emailAddress = table.Column<string>(nullable: true),
-                    userId = table.Column<Guid>(nullable: false),
-                    refTermId = table.Column<Guid>(nullable: false)
+                    EmailAddress = table.Column<string>(nullable: true),
+                    UserId = table.Column<Guid>(nullable: false),
+                    RefTermId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Email", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Email_RefTerm_refTermId",
-                        column: x => x.refTermId,
+                        name: "FK_Email_RefTerm_RefTermId",
+                        column: x => x.RefTermId,
                         principalTable: "RefTerm",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Email_User_userId",
-                        column: x => x.userId,
+                        name: "FK_Email_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -169,22 +169,22 @@ namespace AddressBookAPI.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    phoneNumber = table.Column<string>(nullable: true),
-                    userId = table.Column<Guid>(nullable: false),
-                    refTermId = table.Column<Guid>(nullable: false)
+                    PhoneNumber = table.Column<string>(nullable: true),
+                    UserId = table.Column<Guid>(nullable: false),
+                    RefTermId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Phone", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Phone_RefTerm_refTermId",
-                        column: x => x.refTermId,
+                        name: "FK_Phone_RefTerm_RefTermId",
+                        column: x => x.RefTermId,
                         principalTable: "RefTerm",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Phone_User_userId",
-                        column: x => x.userId,
+                        name: "FK_Phone_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -192,12 +192,10 @@ namespace AddressBookAPI.Migrations
 
             migrationBuilder.InsertData(
                 table: "RefSet",
-                columns: new[] { "Id", "description", "key" },
+                columns: new[] { "Id", "Description", "Key" },
                 values: new object[,]
                 {
-                    { new Guid("7294ac28-c285-4476-89e9-0215d0cb96cd"), "india ", "INDIA" },
                     { new Guid("b4005322-979c-4df5-96b2-16b2f6101006"), "email", "EMAIL_ADDRESS_TYPE" },
-                    { new Guid("4adab962-e8c7-489d-b9eb-2d76c8cc30a2"), "usa", "UNITED_STATES" },
                     { new Guid("9406dc1f-7781-4a7c-9f21-4d0267fb35d3"), "address ", "ADDRESS_TYPE" },
                     { new Guid("1b484930-bf78-4b07-afef-6e9260f31e7b"), "country ", "COUNTRY" },
                     { new Guid("c8dc949e-47f7-4eac-a83d-d0ebc8031300"), "phone", "PHONE_NUMBER_TYPE" }
@@ -205,100 +203,98 @@ namespace AddressBookAPI.Migrations
 
             migrationBuilder.InsertData(
                 table: "RefTerm",
-                columns: new[] { "Id", "description", "key" },
+                columns: new[] { "Id", "Description", "Key" },
                 values: new object[,]
                 {
                     { new Guid("12cf7780-9096-4855-a049-40476cead362"), "work type", "WORK" },
                     { new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce"), "personal type", "PERSONAL" },
                     { new Guid("04cd138d-6ce7-4389-919c-6687cf7f011f"), "alternate  type", "ALTERNATE" },
                     { new Guid("ee3f90cd-2d51-40e8-a25b-f7c81f8e76b2"), "INDIA_TYPE", "INDIA" },
-                    { new Guid("7aae5636-8a33-4cbd-8fbf-09d7c143ed6b"), "USA_TYPE", "USA" },
-                    { new Guid("05e92a12-1241-4a96-92d9-0206e500efee"), "country", "COUNTRY" }
+                    { new Guid("7aae5636-8a33-4cbd-8fbf-09d7c143ed6b"), "USA_TYPE", "USA" }
                 });
 
             migrationBuilder.InsertData(
                 table: "User",
-                columns: new[] { "Id", "firstName", "lastName" },
-                values: new object[] { new Guid("1e39c93c-6f67-4629-a013-ab7dc2c201b4"), "surya", "raju" });
+                columns: new[] { "Id", "FirstName", "LastName" },
+                values: new object[] { new Guid("b28f8b13-fab0-42cf-846d-225da6057a5a"), "surya", "raju" });
 
             migrationBuilder.InsertData(
                 table: "Address",
-                columns: new[] { "Id", "city", "country", "line1", "line2", "refTermId", "stateName", "userId", "zipCode" },
-                values: new object[] { 1, "vizag", new Guid("ee3f90cd-2d51-40e8-a25b-f7c81f8e76b2"), "s-1", "s2", new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce"), "AndhraPradesh", new Guid("1e39c93c-6f67-4629-a013-ab7dc2c201b4"), "531116" });
+                columns: new[] { "Id", "City", "Country", "Line1", "Line2", "RefTermId", "StateName", "UserId", "Zipcode" },
+                values: new object[] { 1, "vizag", new Guid("ee3f90cd-2d51-40e8-a25b-f7c81f8e76b2"), "s-1", "s2", new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce"), "AndhraPradesh", new Guid("b28f8b13-fab0-42cf-846d-225da6057a5a"), "531116" });
 
             migrationBuilder.InsertData(
                 table: "Email",
-                columns: new[] { "Id", "emailAddress", "refTermId", "userId" },
-                values: new object[] { 1, "psuryaraju5@gmail.com", new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce"), new Guid("1e39c93c-6f67-4629-a013-ab7dc2c201b4") });
+                columns: new[] { "Id", "EmailAddress", "RefTermId", "UserId" },
+                values: new object[] { 1, "psuryaraju5@gmail.com", new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce"), new Guid("b28f8b13-fab0-42cf-846d-225da6057a5a") });
 
             migrationBuilder.InsertData(
                 table: "Phone",
-                columns: new[] { "Id", "phoneNumber", "refTermId", "userId" },
-                values: new object[] { 1, "8142255769", new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce"), new Guid("1e39c93c-6f67-4629-a013-ab7dc2c201b4") });
+                columns: new[] { "Id", "PhoneNumber", "RefTermId", "UserId" },
+                values: new object[] { 1, "8142255769", new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce"), new Guid("b28f8b13-fab0-42cf-846d-225da6057a5a") });
 
             migrationBuilder.InsertData(
                 table: "SetRefTerm",
-                columns: new[] { "Id", "refSetId", "refTermId" },
+                columns: new[] { "Id", "RefSetId", "RefTermId" },
                 values: new object[,]
                 {
-                    { new Guid("1202ff32-8983-4ef5-ab36-5151fbe5620b"), new Guid("b4005322-979c-4df5-96b2-16b2f6101006"), new Guid("12cf7780-9096-4855-a049-40476cead362") },
-                    { new Guid("3fd0f674-e20e-4cd2-8512-8600c3af40ff"), new Guid("9406dc1f-7781-4a7c-9f21-4d0267fb35d3"), new Guid("12cf7780-9096-4855-a049-40476cead362") },
-                    { new Guid("d5cf481f-7d61-46e3-83b1-c36f1c419b2e"), new Guid("c8dc949e-47f7-4eac-a83d-d0ebc8031300"), new Guid("12cf7780-9096-4855-a049-40476cead362") },
-                    { new Guid("46f05308-b5df-4ad5-a94b-2f9ba0aaa2db"), new Guid("b4005322-979c-4df5-96b2-16b2f6101006"), new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce") },
-                    { new Guid("221a524f-15eb-421c-8b96-383a4bfa1e46"), new Guid("9406dc1f-7781-4a7c-9f21-4d0267fb35d3"), new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce") },
-                    { new Guid("4d4e3d74-b45f-40ef-94ba-7d9d50b0fcf3"), new Guid("c8dc949e-47f7-4eac-a83d-d0ebc8031300"), new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce") },
-                    { new Guid("b3e4c0da-3621-43f7-9549-84cdfe91b349"), new Guid("b4005322-979c-4df5-96b2-16b2f6101006"), new Guid("04cd138d-6ce7-4389-919c-6687cf7f011f") },
-                    { new Guid("0050c6c6-6ff7-486d-a2d4-75b7ebfaca0a"), new Guid("9406dc1f-7781-4a7c-9f21-4d0267fb35d3"), new Guid("04cd138d-6ce7-4389-919c-6687cf7f011f") },
-                    { new Guid("4ee96531-4dda-4d5b-9cb2-965bec063e72"), new Guid("c8dc949e-47f7-4eac-a83d-d0ebc8031300"), new Guid("04cd138d-6ce7-4389-919c-6687cf7f011f") },
-                    { new Guid("3580a95e-01a9-4298-93ec-57b57c155196"), new Guid("7294ac28-c285-4476-89e9-0215d0cb96cd"), new Guid("ee3f90cd-2d51-40e8-a25b-f7c81f8e76b2") },
-                    { new Guid("d9428266-7e3a-4b58-9b8e-6724e5a00ee1"), new Guid("4adab962-e8c7-489d-b9eb-2d76c8cc30a2"), new Guid("7aae5636-8a33-4cbd-8fbf-09d7c143ed6b") },
-                    { new Guid("ecb24a03-2530-4c54-9f17-1e22900bd44d"), new Guid("1b484930-bf78-4b07-afef-6e9260f31e7b"), new Guid("05e92a12-1241-4a96-92d9-0206e500efee") }
+                    { new Guid("50373bbd-5846-40cf-bd60-021de6f919a5"), new Guid("b4005322-979c-4df5-96b2-16b2f6101006"), new Guid("12cf7780-9096-4855-a049-40476cead362") },
+                    { new Guid("8beb045a-988a-4199-a0e4-0673b9d60e34"), new Guid("9406dc1f-7781-4a7c-9f21-4d0267fb35d3"), new Guid("12cf7780-9096-4855-a049-40476cead362") },
+                    { new Guid("bf325767-e54a-47df-b733-cf7f65e64dee"), new Guid("c8dc949e-47f7-4eac-a83d-d0ebc8031300"), new Guid("12cf7780-9096-4855-a049-40476cead362") },
+                    { new Guid("fb9646a4-3c58-43dd-a919-8dc457559422"), new Guid("b4005322-979c-4df5-96b2-16b2f6101006"), new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce") },
+                    { new Guid("28f501c3-f8ae-48fe-bb35-e25ecaa56f22"), new Guid("9406dc1f-7781-4a7c-9f21-4d0267fb35d3"), new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce") },
+                    { new Guid("ad1304c1-270a-481a-a99c-b1781e2ce33c"), new Guid("c8dc949e-47f7-4eac-a83d-d0ebc8031300"), new Guid("f87b8232-f2d8-4286-ac13-422aa54194ce") },
+                    { new Guid("edaa1847-9bcc-407b-894c-d7cb3caa615a"), new Guid("b4005322-979c-4df5-96b2-16b2f6101006"), new Guid("04cd138d-6ce7-4389-919c-6687cf7f011f") },
+                    { new Guid("5554537c-5721-468d-a3e5-be5234778bf1"), new Guid("9406dc1f-7781-4a7c-9f21-4d0267fb35d3"), new Guid("04cd138d-6ce7-4389-919c-6687cf7f011f") },
+                    { new Guid("0a2991e5-f5ea-4f36-8e75-5157440b4760"), new Guid("c8dc949e-47f7-4eac-a83d-d0ebc8031300"), new Guid("04cd138d-6ce7-4389-919c-6687cf7f011f") },
+                    { new Guid("8ffc2abc-8abb-442e-85dd-bfa1fab18d85"), new Guid("1b484930-bf78-4b07-afef-6e9260f31e7b"), new Guid("ee3f90cd-2d51-40e8-a25b-f7c81f8e76b2") },
+                    { new Guid("1a433bb5-263f-4df8-bec5-8318cb56755e"), new Guid("1b484930-bf78-4b07-afef-6e9260f31e7b"), new Guid("7aae5636-8a33-4cbd-8fbf-09d7c143ed6b") }
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Address_refTermId",
+                name: "IX_Address_RefTermId",
                 table: "Address",
-                column: "refTermId");
+                column: "RefTermId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Address_userId",
+                name: "IX_Address_UserId",
                 table: "Address",
-                column: "userId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AssetDTO_userId",
+                name: "IX_AssetDTO_UserId",
                 table: "AssetDTO",
-                column: "userId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Email_refTermId",
+                name: "IX_Email_RefTermId",
                 table: "Email",
-                column: "refTermId");
+                column: "RefTermId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Email_userId",
+                name: "IX_Email_UserId",
                 table: "Email",
-                column: "userId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Phone_refTermId",
+                name: "IX_Phone_RefTermId",
                 table: "Phone",
-                column: "refTermId");
+                column: "RefTermId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Phone_userId",
+                name: "IX_Phone_UserId",
                 table: "Phone",
-                column: "userId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SetRefTerm_refSetId",
+                name: "IX_SetRefTerm_RefSetId",
                 table: "SetRefTerm",
-                column: "refSetId");
+                column: "RefSetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SetRefTerm_refTermId",
+                name: "IX_SetRefTerm_RefTermId",
                 table: "SetRefTerm",
-                column: "refTermId");
+                column: "RefTermId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

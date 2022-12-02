@@ -9,19 +9,38 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Entity.Models
 {
-    public class user
+    public class User
     {
         public Guid Id { get; set; }
-        public string firstName { get; set; }
 
-        public string lastName { get; set; }
+        ///<summary>
+        /// first name of the user 
+        ///</summary>
+        public string FirstName { get; set; }
 
-        public ICollection<address> address { get; set; }
+        ///<summary>
+        /// last name of the user 
+        ///</summary>
+        public string LastName { get; set; }
 
-        public ICollection<asset> assetdto { get; set; }
+        ///<summary>
+        /// address of the user 
+        ///</summary>
+        public ICollection<Address> Address { get; set; }
 
-        public ICollection<email> email { get; set; }
+        ///<summary>
+        /// profile picture of the user 
+        ///</summary>
+        public ICollection<Asset> Assetdto { get; set; }
 
-        public ICollection<phone> phone { get; set; }
+        ///<summary>
+        /// email address of the user 
+        ///</summary>
+        public ICollection<Email> Email { get; set; }
+
+        ///<summary>
+        /// phone number of the user 
+        ///</summary>
+        public ICollection<Phone> Phone { get; set; }
     }
 }

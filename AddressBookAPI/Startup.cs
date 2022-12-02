@@ -1,4 +1,5 @@
 using AddressBookAPI.Controllers;
+using AddressBookAPI.Entity.Dto;
 using AddressBookAPI.Entity.Models;
 using AddressBookAPI.Repository;
 using AddressBookAPI.Services;
@@ -6,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -83,10 +86,6 @@ namespace AddressBookAPI
                     Version = "v1",
                     Description = "Open API AddressBook",
                 });
-
-                //   var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                //   var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                //   c.IncludeXmlComments(xmlPath);
             });
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -95,7 +94,15 @@ namespace AddressBookAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseStatusCodePages(async context =>
+           {
+               if (context.HttpContext.Response.StatusCode == 401)
+               {
+                   await context.HttpContext.Response.WriteAsync(JsonConvert.SerializeObject(new ErrorDTO { type = "Login", description = "Invalid Login Credientials" })    );
+                   
+                  
+               }
+           });
             app.UseSwagger();
             app.UseSwaggerUI();
 

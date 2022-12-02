@@ -6,13 +6,19 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Entity.Models
 {
-    public class login
+    public class Login
     {
         public int Id { get; set; }
 
-        public string userName { get; set; }
-       
-        public string password { get; set; }
+        ///<summary>
+        /// user name of the login user 
+        ///</summary>
+        public string UserName { get; set; }
+
+        ///<summary>
+        /// password of the user
+        ///</summary>
+        public string Password { get; set; }
     }
 }
 

@@ -18,12 +18,12 @@ namespace AddressBookAPI.Entity.Dto
         [Required]
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
         [JsonProperty(PropertyName = "first_name")]
-        public string firstName { get; set; }
+        public string FirstName { get; set; }
 
        
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
         [JsonProperty(PropertyName = "last_name")]
-        public string lastName { get; set; }
+        public string LastName { get; set; }
 
         [Required]
         public ICollection<AddressDTO> Address { get; set; }

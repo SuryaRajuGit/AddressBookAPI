@@ -6,14 +6,20 @@ using System.Threading.Tasks;
 
 namespace AddressBookAPI.Entity.Models
 {
-    public class refTerm
+    public class RefTerm
     {
         [Key]
         public Guid Id { get; set; }
 
-        public string key { get; set; }
+        ///<summary>
+        /// reterm key 
+        ///</summary>
+        public string Key { get; set; }
 
-        public string description { get; set; }
+        ///<summary>
+        /// description of the key 
+        ///</summary>
+        public string Description { get; set; }
 
 
     }
