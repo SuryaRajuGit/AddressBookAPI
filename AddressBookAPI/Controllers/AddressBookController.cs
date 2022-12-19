@@ -31,7 +31,7 @@ namespace AddressBookAPI.Controllers
 {
     [Route("api")]
     [ApiController]
-    // [Authorize(AuthenticationSchemes ="Bearer")]
+     [Authorize(AuthenticationSchemes ="Bearer")]
     public class AddressBookController : ControllerBase
     {
         private readonly ILogger _logger;
@@ -100,7 +100,7 @@ namespace AddressBookAPI.Controllers
 
 
         }
-
+        [AllowAnonymous]
         [HttpPost]
         [Route("signup")] //
         [ProducesResponseType(typeof(ErrorDTO), StatusCodes.Status409Conflict)]
@@ -128,7 +128,7 @@ namespace AddressBookAPI.Controllers
                 _logger.LogError("username already exists");
                 return StatusCode(409, new ErrorDTO
                 {
-                    type = "AddressBook",
+                    type = "User name",
                     description = response +
                     "  already exists"
                 });
@@ -300,6 +300,10 @@ namespace AddressBookAPI.Controllers
         ///<returns>checks the user login details in database</returns>
         public IActionResult GetAddressBookCount()
         {
+          //  var tok = HttpContext.Get ("Bearer", "access_token");
+            string userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+
+
             _logger.LogInformation("getting number of addressbooks started");
             // returns Int ,gets the count of addressbooks in the database.
             int count =  _addressBookServices.GetAddressBookCount();

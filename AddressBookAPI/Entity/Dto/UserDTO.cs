@@ -35,8 +35,6 @@ namespace AddressBookAPI.Entity.Dto
 
         [Required]
         public ICollection<PhoneDTO> Phone { get; set; }
-
-        
-
+ 
     }
 }

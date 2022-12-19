@@ -77,7 +77,9 @@ namespace AddressBookAPI.Services
                     Subject = new System.Security.Claims.ClaimsIdentity(
                         new Claim[]
                         {
-                            new Claim(ClaimTypes.Name, logInDTO.UserName) }
+                            new Claim(ClaimTypes.Name, logInDTO.UserName) ,
+                         //   new Claim("role","user1"),
+                        }
                         ),
                     Expires = DateTime.UtcNow.AddMinutes(30),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)

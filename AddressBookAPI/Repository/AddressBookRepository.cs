@@ -126,19 +126,15 @@ namespace AddressBookAPI.Repository
         }
 
 
-        // 
         ///<summary>
         ///returns count of addressBook count 
         ///</summary>
         ///<returns>int<refTerm></returns>
         public int GetAddressBookCount()
         {
-           
-            return _context.User.Include(s =>s.Email).Include(a => a.Address).Include(p => p.Phone).Select(s => s.Id).Count();
-        
+            return _context.User.Include(s => s.Email).Include(a => a.Address).Include(p => p.Phone).Select(s => s.Id).Count();
         }
 
-        //  
         ///<summary>
         /// takes Args as Email and checks in database ,returns string 
         ///</summary>
@@ -226,7 +222,6 @@ namespace AddressBookAPI.Repository
         ///<param name="account"></param>
         public void RemoveAccount(User account)
         {
-          
              _context.Remove(account);
              _context.SaveChanges();
         }
@@ -263,7 +258,6 @@ namespace AddressBookAPI.Repository
           
         }
 
-        //
         ///<summary>
         /// returns bytes of file 
         ///</summary>
@@ -274,7 +268,6 @@ namespace AddressBookAPI.Repository
             return _context.AssetDTO.Where(fnd => fnd.Id == id).Select(src => src.Field).FirstOrDefault();
         }
 
-        //
         ///<summary>
         ///saves new Admin login details into database
         ///</summary>

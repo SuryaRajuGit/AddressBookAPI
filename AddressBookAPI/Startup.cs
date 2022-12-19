@@ -58,6 +58,7 @@ namespace AddressBookAPI
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"])),
                         ValidateIssuer = false,
                         ValidateAudience = false,
+                        RoleClaimType = "role-abc",
                     };
                 });
             services.AddAutoMapper(typeof(Startup));
