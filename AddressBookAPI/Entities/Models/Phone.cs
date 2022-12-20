@@ -9,6 +9,9 @@ namespace AddressBookAPI.Entity.Models
 {
     public class Phone
     {
+        ///<summary>
+        /// Id of the Phone 
+        ///</summary>
         public int Id { get; set; }
 
         ///<summary>

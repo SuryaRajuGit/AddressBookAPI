@@ -11,7 +11,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using AddressBookAPI.Services;
@@ -59,7 +58,7 @@ namespace AddressBookAPI.Repository
         ///<param name="size"></param>
         ///<param name="pageNo"></param>
         ///<returns>List of addressBooks</returns>
-        public List<User> GetPageinatedList( int size, int pageNo)
+        public List<User> GetPaginatedList( int size, int pageNo)
         {
             List<User> listOfUsers  = _context.User.Include(eml => eml.Email).Include(phn => phn.Phone).Include(art => art.Address)
               .Skip((pageNo - 1) * 5)
@@ -92,7 +91,12 @@ namespace AddressBookAPI.Repository
             _context.SaveChanges();
         }
 
-        public bool IsCountryExixsted(string type)
+        ///<summary>
+        /// returns bool value if the country exists
+        ///</summary>
+        ///<param name="type"></param>
+        ///<returns>bool</returns>
+        public bool IsCountryExisted(string type)
         {
             return _context.RefTerm.Any(cus => cus.Id == Guid.Parse(type));
         }
@@ -157,7 +161,6 @@ namespace AddressBookAPI.Repository
             return null;
         }
 
-        //  
         ///<summary>
         /// takes Args as Phone and checks in database ,returns string
         ///</summary>
@@ -170,7 +173,7 @@ namespace AddressBookAPI.Repository
                     _context.Phone.Select(src => src.PhoneNumber).ToList();
             foreach (string item in phone.Select(src => src.PhoneNumber))
             {
-                bool userPhone = phoneList.Contains(item);     //_context.Phone.Where(w => w.phoneNumber == item).FirstOrDefault();
+                bool userPhone = phoneList.Contains(item);   
                 if (userPhone)
                 {
                     return item;
@@ -179,7 +182,7 @@ namespace AddressBookAPI.Repository
             return null;
         }
 
-        //  
+        
         ///<summary>
         /// takes Args as Address and checks in database ,returns string
         ///</summary>
@@ -215,7 +218,7 @@ namespace AddressBookAPI.Repository
             return null;
         }
 
-        //
+       
         ///<summary>
         /// Delets addressBook from database
         ///</summary>
@@ -226,7 +229,7 @@ namespace AddressBookAPI.Repository
              _context.SaveChanges();
         }
 
-        //
+        
         ///<summary>
         /// saves AdderssBoook to database
         ///</summary>
@@ -236,7 +239,7 @@ namespace AddressBookAPI.Repository
             _context.Add(account);
             _context.SaveChanges();
         }
-        //
+        
         ///<summary>
         /// saves file to database
         ///</summary>

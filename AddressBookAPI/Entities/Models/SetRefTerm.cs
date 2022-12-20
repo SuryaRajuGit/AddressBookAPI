@@ -6,28 +6,25 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace AddressBookAPI.Entity.Models
-{   
-
-    public class Email
+{
+    public class SetRefTerm
     {
-    
-        public int Id { get; set; }
-
+        [Key]
         ///<summary>
-        /// Email address of the user  
+        /// Id of the SetRefTerm 
         ///</summary>
-        public string EmailAddress { get; set; }
-       
-        public Guid UserId { get; set; }
-        public User user { get; set; }
+        public Guid Id { get; set; }
 
         ///<summary>
-        /// type of email address 
+        /// refset Id 
+        ///</summary>
+        public Guid RefSetId { get; set; }
+        public RefSet RefSet { get; set; }
+
+        ///<summary>
+        /// refterm id 
         ///</summary>
         public Guid RefTermId { get; set; }
-        public RefTerm refTerm { get; set; }
-
+        public RefTerm RefTerm { get; set; }
     }
-
-   
 }

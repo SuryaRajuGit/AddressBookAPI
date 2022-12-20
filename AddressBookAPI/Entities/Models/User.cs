@@ -11,6 +11,9 @@ namespace AddressBookAPI.Entity.Models
 {
     public class User
     {
+        ///<summary>
+        /// Id of the User 
+        ///</summary>
         public Guid Id { get; set; }
 
         ///<summary>

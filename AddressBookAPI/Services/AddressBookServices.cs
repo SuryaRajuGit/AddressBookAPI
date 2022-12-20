@@ -22,7 +22,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using AddressBookAPI.Entity.Dto;
 using AddressBookAPI.Entity.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -44,7 +43,7 @@ namespace AddressBookAPI.Services
              _mapper = mapper;
         }
 
-        // 
+        
         ///<summary>
         ///verifies user login details and returns logInResponseDTO Dto
         ///</summary>
@@ -78,7 +77,6 @@ namespace AddressBookAPI.Services
                         new Claim[]
                         {
                             new Claim(ClaimTypes.Name, logInDTO.UserName) ,
-                         //   new Claim("role","user1"),
                         }
                         ),
                     Expires = DateTime.UtcNow.AddMinutes(30),
@@ -98,7 +96,7 @@ namespace AddressBookAPI.Services
 
         }
 
-        //
+        
         ///<summary>
         ///returns all AddressBooks from database
         ///</summary>
@@ -110,7 +108,7 @@ namespace AddressBookAPI.Services
         public List<UserDTO> GetAllAddressBooks(int size , int pageNo , string sortBy , string sortOrder )
         {
             // takes Args size Int,pageNo Int ,returns list of AddressBooks after applying pagenation
-            List<User> paginatedList = _addressBookRepository.GetPageinatedList(size, pageNo);
+            List<User> paginatedList = _addressBookRepository.GetPaginatedList(size, pageNo);
             IEnumerable<User> sortList;
             if (paginatedList == null)
             {
@@ -136,22 +134,22 @@ namespace AddressBookAPI.Services
                
                 foreach (string item in user.Email.Select(s => s.Type.Key))
                 {
-                    Guid sample;
-                    if (!Guid.TryParse(item, out sample))
+                    Guid id;
+                    if (!Guid.TryParse(item, out id))
                     {
                         break;
                     }
-                    string type = _addressBookRepository.GetType(sample);
+                    string type = _addressBookRepository.GetType(id);
                     user.Email.Where(s => s.Type.Key == item).Select(src => { src.Type.Key = type; return src; }).ToList();
                 }
                 foreach (string item in user.Phone.Select(src => src.Type.Key))
                 {
-                    Guid sample;
-                    if (!Guid.TryParse(item, out sample))
+                    Guid id;
+                    if (!Guid.TryParse(item, out id))
                     {
                         break;
                     }
-                    string type = _addressBookRepository.GetType(sample);
+                    string type = _addressBookRepository.GetType(id);
                     user.Phone.Where(src => src.Type.Key == item).Select(crc => { crc.Type.Key = type; return crc; }).ToList();
                 }
                 Guid countryKey = Guid.Parse(user.Address.Select(src => src.Country.Key).FirstOrDefault());
@@ -233,7 +231,7 @@ namespace AddressBookAPI.Services
             {
                 return new ErrorDTO { type = "AddressBook", description = "AddressBook not found " };
             }
-            bool isCountryExists = _addressBookRepository.IsCountryExixsted(userDTO.Address.Select(s => s.Country.Key).First());
+            bool isCountryExists = _addressBookRepository.IsCountryExisted(userDTO.Address.Select(s => s.Country.Key).First());
             if (!isCountryExists)
             {
                 return new ErrorDTO { type = "meta-data", description = "Meta-data not found" };
@@ -267,7 +265,6 @@ namespace AddressBookAPI.Services
                     PhoneNumber = src.PhoneNumber
                 }).ToList().ToList();
 
-            
                 _addressBookRepository.UpdateToDataBase(account);
             }
             catch
@@ -290,7 +287,7 @@ namespace AddressBookAPI.Services
                 description = ModelState.Values.Select(src => src.Errors[0].ErrorMessage).FirstOrDefault()
             };
         }
-        // 
+        
         ///<summary>
         ///validation attribute error 
         ///</summary>
@@ -305,7 +302,7 @@ namespace AddressBookAPI.Services
                 ModelState.Values.Select(src => src.Errors.Select(src => src.ErrorMessage).FirstOrDefault()).FirstOrDefault()
             };
         }
-        // 
+        
         ///<summary>
         ///Gets count of AddressBooks from database
         ///</summary>
@@ -315,15 +312,19 @@ namespace AddressBookAPI.Services
             return _addressBookRepository.GetAddressBookCount();
         }
 
-        // Checks email exists in the database and return string 
+        
+        ///<summary>
+        ///Checks email exists in the database and return string 
+        ///</summary>
+        ///<returns>ErrorDTO</returns>
         public ErrorDTO EmailExists(ICollection<EmailDTO> email, Guid id)
         {
            
-                bool isEmailDup = IsEmailMatched(email);
-                if(isEmailDup)
-                {
-                    return  new ErrorDTO { type = "email", description = "both entered Emails are same" };
-                }
+            bool isEmailDup = IsEmailMatched(email);
+            if(isEmailDup)
+            {
+                return  new ErrorDTO { type = "email", description = "both entered Emails are same" };
+            }
 
             //takes Args email ICollection<EmailDTO> , returns string , checks emails exist in the database
         string isEmailExists = _addressBookRepository.EmailList(email,id);
@@ -339,7 +340,7 @@ namespace AddressBookAPI.Services
             return null;
         }
 
-        // 
+        
         ///<summary>
         ///Checks phone no exists in the database and return string
         ///</summary>
@@ -349,11 +350,11 @@ namespace AddressBookAPI.Services
         public ErrorDTO PhoneExists(ICollection<PhoneDTO> phone,Guid id)
         {
             
-                bool isPhoneDup = IsPhoneMatched(phone);
-                if (isPhoneDup)
-                {
-                    return new ErrorDTO { type = "phone", description = "both entered Phone no are same" };
-                }
+            bool isPhoneDup = IsPhoneMatched(phone);
+            if (isPhoneDup)
+            {
+                return new ErrorDTO { type = "phone", description = "both entered Phone no are same" };
+            }
             
            //  takes Args phone ICollection<PhoneDTO> ,returns string ,checks phone no exist in the database
             string isPhoneExists = _addressBookRepository.PhoneList(phone,id);
@@ -413,7 +414,7 @@ namespace AddressBookAPI.Services
             };
         }
 
-        // 
+        
         ///<summary>
         /// Checks address exists in the database and return string
         ///</summary>
@@ -437,7 +438,7 @@ namespace AddressBookAPI.Services
             return null;
         }
 
-        // 
+         
 
         ///<summary>
         ///Saves new AddressBook into database 
@@ -447,7 +448,7 @@ namespace AddressBookAPI.Services
         public Guid? SaveToDatabase(UserDTO userDTO)
         {
             Guid newId = Guid.NewGuid();
-            bool isCountryExists = _addressBookRepository.IsCountryExixsted(userDTO.Address.Select(src => src.Country.Key).First());
+            bool isCountryExists = _addressBookRepository.IsCountryExisted(userDTO.Address.Select(src => src.Country.Key).First());
             if(!isCountryExists)
             {
                 return null;
@@ -501,7 +502,7 @@ namespace AddressBookAPI.Services
             
         }
 
-        //
+   
         ///<summary>
         ///Deletes AddressBook from database
         ///</summary>
@@ -520,7 +521,7 @@ namespace AddressBookAPI.Services
             return string.Empty;
         }
 
-        //
+        
         ///<summary>
         ///uploads file into database in form of bytes
         ///</summary>
@@ -616,7 +617,7 @@ namespace AddressBookAPI.Services
             return addressBookObj;
         }
 
-        // 
+        
         ///<summary>
         /// saves new Admin logins into database 
         ///</summary>

@@ -10,8 +10,7 @@ namespace AddressBookAPI.Entity.Dto
 {
     public class PhoneDTO
     {
-        //[DataType(DataType.PhoneNumber)]
-     //   [RegularExpression(@"^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[789]\d{9}$", ErrorMessage = "The PhoneNumber field is not a valid phone number")]
+        
         [Phone(ErrorMessage = "The PhoneNumber field is not a valid phone number")]
         [Required]
         [MinLength(10)]

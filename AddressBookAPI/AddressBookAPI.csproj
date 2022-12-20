@@ -32,9 +32,5 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="7.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
-  </ItemGroup>
-
 
 </Project>

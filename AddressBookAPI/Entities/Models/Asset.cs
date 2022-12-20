@@ -9,7 +9,10 @@ namespace AddressBookAPI.Entity.Models
 {
     public class Asset
     {
-       public Guid Id { get; set; }
+        ///<summary>
+        /// Id of the Asset 
+        ///</summary>
+        public Guid Id { get; set; }
 
         ///<summary>
         /// binary data of the profile pic of user

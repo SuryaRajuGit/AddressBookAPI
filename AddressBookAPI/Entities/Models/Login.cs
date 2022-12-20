@@ -8,6 +8,9 @@ namespace AddressBookAPI.Entity.Models
 {
     public class Login
     {
+        ///<summary>
+        /// Id of the Login 
+        ///</summary>
         public int Id { get; set; }
 
         ///<summary>

@@ -40,11 +40,11 @@ namespace AddressBookAPI.Entity.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\Book1.csv";
+            string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entities\Migrations\Book1.csv";
             string ReadCSV = File.ReadAllText(path);
-            var data = ReadCSV.Split('\r');
-            var list = new List<RefTerm>();
-            foreach (var item in data)
+            string[] data = ReadCSV.Split('\r');
+            List<RefTerm> list = new List<RefTerm>();
+            foreach (string item in data)
             {
                 string[] row = item.Split(",");
                 RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString() };
@@ -53,7 +53,7 @@ namespace AddressBookAPI.Entity.Models
             modelBuilder.Entity<RefTerm>()
             .HasData(list);
 
-            string path1 = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\TextFile.csv";
+            string path1 = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entities\Migrations\TextFile.csv";
             string ReadCsv = File.ReadAllText(path1);
             string[] data1 = ReadCsv.Split('\r');
             Guid id = Guid.NewGuid();
@@ -63,7 +63,7 @@ namespace AddressBookAPI.Entity.Models
                   .WithMany(s => s.Phone)
                   .HasForeignKey(s => s.UserId);
             int count = 0;
-            foreach (var item in data1)
+            foreach (string item in data1)
             {
                 string[] row = item.Split(",");
                 id = Guid.NewGuid();
@@ -109,11 +109,11 @@ namespace AddressBookAPI.Entity.Models
             }
 
 
-            string path2 = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\refSet.csv";
+            string path2 = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entities\Migrations\refSet.csv";
             string ReadCsvRefSet = File.ReadAllText(path2);
             string[] dataRefSet = ReadCsvRefSet.Split('\r');
 
-            foreach (var item in dataRefSet)
+            foreach (string item in dataRefSet)
             {
                 string[] row = item.Split(",");
 
@@ -127,12 +127,12 @@ namespace AddressBookAPI.Entity.Models
                 modelBuilder.Entity<RefSet>().HasData(refSet1);
             }
 
-            string path3 = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\Migrations\refSetTerm.csv";
+            string path3 = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entities\Migrations\refSetTerm.csv";
             string ReadCsvRefSetTerm = File.ReadAllText(path3);
             string[] dataRefSetTerm = ReadCsvRefSetTerm.Split('\r');
 
             List<SetRefTerm> ll = new List<SetRefTerm>();
-            foreach (var item in dataRefSetTerm)
+            foreach (string item in dataRefSetTerm)
             {
                 string[] row = item.Split(",");
 

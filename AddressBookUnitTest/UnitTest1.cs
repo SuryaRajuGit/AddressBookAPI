@@ -29,7 +29,7 @@ using Xunit;
 
 namespace AddressBookUnitTest
 {
-    public class UnitTest1 //: IClassFixture<InjectionFixture>
+    public class UnitTest1 
     {
         private readonly IMapper _mapper;
         private readonly AddressBookController _addresBookController;
@@ -38,7 +38,6 @@ namespace AddressBookUnitTest
         private readonly IConfiguration _configuration;
         private readonly IServer _server;
         private readonly AddressBookContext _context;
-        private readonly ILogger _logger;
         public UnitTest1()
         {
             IHostBuilder hostBuilder = Host.CreateDefaultBuilder().
@@ -71,96 +70,60 @@ namespace AddressBookUnitTest
         }
         public void addData()
         {
-            List<User> list = new List<User>
-                {
-            new User()
-            {
-                Id = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                FirstName = "abc",
-                LastName = "xyz",
 
-                Email = new List<Email>() {
+            string path = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entities\UnitTestFiles\data.csv";
+            string ReadCSV = File.ReadAllText(path);
+            string[] data = ReadCSV.Split('\r');
+            List<User> list = new List<User>();
+            foreach (string item in data)
+            {
+                string[] row = item.Split(",");
+                User user = new User()
+                {
+                    Id = Guid.Parse(row[0]),
+                    FirstName = row[1],
+                    LastName = row[2],
+
+                    Email = new List<Email>() {
                 new Email
                    {
-                       EmailAddress = "abc@gmail.com",
-                       UserId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                       RefTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
+                       EmailAddress = row[3],
+                       UserId = Guid.Parse(row[4]),
+                       RefTermId = Guid.Parse(row[5]),
                    }, },
-                Address = new List<Address>() {
+                    Address = new List<Address>() {
                 new Address
                 {
-                    Line1 = "1st",
-                    Line2 = "line2",
-                    Country = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                    UserId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                    RefTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                    StateName = "stateName",
-                    City = "city",
-                    Zipcode ="zipCode"
+                    Line1 = row[6],
+                    Line2 = row[7],
+                    Country = Guid.Parse(row[8]),
+                    UserId = Guid.Parse(row[9]),
+                    RefTermId = Guid.Parse(row[10]),
+                    StateName = row[11],
+                    City = row[12],
+                    Zipcode = row[13]
                 },},
 
-                Phone =new List<Phone> {
+                    Phone = new List<Phone> {
                 new Phone
                 {
-                    RefTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                    UserId =Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9") ,
-                    PhoneNumber = "8152233879"
+                    RefTermId = Guid.Parse(row[14]),
+                    UserId =Guid.Parse(row[15]) ,
+                    PhoneNumber = row[16]
                 },new Phone
                 {
-                    RefTermId = Guid.Parse("F87B8232-F2D8-4286-AC13-422AA54194CE"),
-                    UserId =Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9") ,
-                    PhoneNumber = "8122233879"
+                    RefTermId = Guid.Parse(row[17]),
+                    UserId =Guid.Parse(row[18]) ,
+                    PhoneNumber = row[19]
                 } }
 
-        },new User()
-            {
-                Id = Guid.Parse("E1E91040-8C5E-4748-A625-2E493C7818D9"),
-                FirstName = "def",
-                LastName = "jkh",
+                };
+                list.Add(user);
 
-                Email = new List<Email>() {
-                new Email
-                   {
-                       EmailAddress = "xyz@gmail.com",
-                       UserId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                       RefTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                   }, 
-                new Email
-                   {
-                       EmailAddress = "affbc@gmail.com",
-                       UserId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                       RefTermId = Guid.Parse("04CD138D-6CE7-4389-919C-6687CF7F011F"),
-                   } },
+            }
 
-                Address = new List<Address>() {
-                new Address
-                {
-                    Line1 = "1st",
-                    Line2 = "line2",
-                    Country = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                    UserId = Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9"),
-                    RefTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                    StateName = "stateName",
-                    City = "city",
-                    Zipcode ="zipCode"
-                },},
-
-                Phone =new List<Phone> {
-                new Phone
-                {
-                    RefTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                    UserId =Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9") ,
-                    PhoneNumber = "9152233879"
-                },new Phone
-                {
-                    RefTermId = Guid.Parse("F87B8232-F2D8-4286-AC13-422AA54194CE"),
-                    UserId =Guid.Parse("D1E91040-8C5E-4748-A625-2E493C7818D9") ,
-                    PhoneNumber = "0122233879"
-                } }
-
-        }, };
-
-            FileStream sourceImg = File.OpenRead(@"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\files\cap2.PNG");
+            
+            FileStream sourceImg = File.OpenRead(@"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entities\UnitTestFiles\files\cap2.PNG");
             MemoryStream memoryStream = new MemoryStream();
             sourceImg.CopyToAsync(memoryStream);
             byte[] bytearr = memoryStream.ToArray();
@@ -168,28 +131,38 @@ namespace AddressBookUnitTest
 
             Login valdLogin = new Login { Password = "UnVmvnspqYZtOlgWDkmkKAbuj7qrNOH9", UserName = "surya123" };
 
-            RefTerm termData = new RefTerm
-            {
-                Id =Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362"),
-                Key = "WORK",
-                Description= "work type"
-            };
-            RefSet setData = new RefSet
-            {
-                Id = Guid.Parse("C8DC949E-47F7-4EAC-A83D-D0EBC8031300"),
-                Key= "PHONE_NUMBER_TYPE",
-                Description= "phone"
-            };
-            SetRefTerm setTerm = new SetRefTerm
-            {
-                Id = Guid.NewGuid(),
-                RefSetId = Guid.Parse("C8DC949E-47F7-4EAC-A83D-D0EBC8031300"),
-                RefTermId = Guid.Parse("12CF7780-9096-4855-A049-40476CEAD362")
-            };
+            string path1 = @"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entities\UnitTestFiles\RefData.csv";
+            string ReadCSV1 = File.ReadAllText(path1);
+            string[] data1 = ReadCSV1.Split('\r');
 
-            _context.Add(termData);
-            _context.Add(setData);
-            _context.Add(setTerm);
+
+
+            foreach (string item in data1)
+            {
+                string[] row = item.Split(",");
+                RefTerm termData = new RefTerm
+                {
+                    Id = Guid.Parse(row[0]),
+                    Key = row[1],
+                    Description = row[2]
+                };
+                RefSet setData = new RefSet
+                {
+                    Id = Guid.Parse(row[3]),
+                    Key = row[4],
+                    Description = row[5]
+                };
+                SetRefTerm setTerm = new SetRefTerm
+                {
+                    Id = Guid.NewGuid(),
+                    RefSetId = Guid.Parse(row[6]),
+                    RefTermId = Guid.Parse(row[7])
+                };
+                _context.Add(termData);
+                _context.Add(setData);
+                _context.Add(setTerm);
+            }
+            
             _context.Login.Add(valdLogin);
             _context.User.AddRange(list);
             _context.AssetDTO.Add(assetdto);
@@ -262,7 +235,7 @@ namespace AddressBookUnitTest
         public  void UploadFile_Test()
         {
             Mock<IFormFile> file = new Mock<IFormFile>();
-            FileStream sourceImg = File.OpenRead(@"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entity\files\cap2.PNG");
+            FileStream sourceImg = File.OpenRead(@"C:\Users\Hp\source\repos\AddressBookAPI\AddressBookAPI\Entities\UnitTestFiles\files\cap2.PNG");
             MemoryStream stream = new MemoryStream();
             StreamWriter writer = new StreamWriter(stream);
             writer.Write(sourceImg);
@@ -279,8 +252,6 @@ namespace AddressBookUnitTest
 
             Assert.IsType<OkObjectResult>(okResult.Result); 
             Assert.IsType<UploadResponseDTO>(result.Value);
-        //    var bookItem = result.Value as UploadResponseDTO;
-         //   Assert.Equal(fileName, bookItem.fileName);
         }
 
         [Fact]

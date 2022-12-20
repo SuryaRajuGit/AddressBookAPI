@@ -30,8 +30,4 @@
     <ProjectReference Include="..\AddressBookAPI\AddressBookAPI.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="files\" />
-  </ItemGroup>
-
 </Project>
