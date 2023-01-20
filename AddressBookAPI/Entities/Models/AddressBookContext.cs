@@ -147,8 +147,6 @@ namespace AddressBookAPI.Entity.Models
             }
             modelBuilder.Entity<SetRefTerm>().HasData(ll);
         }
-
-
     }
 
 }

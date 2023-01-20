@@ -211,7 +211,6 @@ namespace AddressBookAPI.Services
                 {
                     return true;
                 }
-
             }
             return false;
 
@@ -410,7 +409,6 @@ namespace AddressBookAPI.Services
                 
                 description = modelState.Values.Where(wre => wre.ValidationState.ToString() == Constants.invalid).
                 Select(src => src.Errors[0].ErrorMessage).FirstOrDefault()
-            
             };
         }
 
