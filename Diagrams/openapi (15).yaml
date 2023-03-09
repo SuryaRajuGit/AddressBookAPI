@@ -1,0 +1,856 @@
+
+openapi: 3.0.1
+info:
+  title: AddressBook
+  description: Open API AddressBook
+  version: v1
+servers:
+  - url: http://localhost:6162
+paths:
+  /api/account:
+    post:
+      tags:
+        - AddressBook
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+      responses:
+        '201':
+          description: AddressBook has been Created Sucessfully
+          content :
+            text/plain:
+              example : "4adab962-e8c7-489d-b9eb-2d76c8cc30a2"
+        '400':
+          description: Entered Wrong Details
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '401':
+          description: Entered Unauthorised Credentials 
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  type:
+                    type: string 
+                  descrption:
+                    type: string
+            
+        '404':
+          description: Not Content With the key 
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '409':
+          description: The details entered already exists in the database
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: InternalServerError
+          
+            
+    get:
+      tags:
+        - AddressBook
+      parameters:
+        - name: size
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: page-no
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: sort-by
+          in: query
+          schema:
+            type: string
+        - name: sort-order
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: AddressBook has been reterived Sucessfully 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/create'
+        '401':
+          description: Entered Unauthorised Credentials
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  type:
+                    type: string 
+                  descrption:
+                    type: string
+        '404':
+          description: AddressBook not found with the key
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: InternalServerError
+  /api/signup:
+    post:
+      tags:
+        - AddressBook
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/SignupDTO'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupDTO'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SignupDTO'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SignupDTO'
+      responses:
+        '200':
+          description: Sinup Sucessfull 
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '409':
+          description: Conflict
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: InternalServerError
+  /api/account/{id}:
+    delete:
+      tags:
+        - AddressBook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: AddressBook has been Deleted Sucessfully
+        '401':
+          description:  Unauthorised Credentials
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  type:
+                    type: string 
+                  descrption:
+                    type: string
+        '404':
+          description: AddressBook not found with the key
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: InternalServerError
+    get:
+      tags:
+        - AddressBook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: AddressBook reterieved Sucessfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create'
+        '401':
+          description: Unauthorised Credentials
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  type:
+                    type: string 
+                  descrption:
+                    type: string
+        '404':
+          description: AddressBook not found with the Key
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: InternalServerError
+    put:
+      tags:
+        - AddressBook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+      responses:
+        '200':
+          description: AddressBook Updated sucessfully
+        '400':
+          description: Entered wrong data
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '404':
+          description: AddressBook not found with the key
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '401':
+          description: Unauthorised Credentials
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  type:
+                    type: string 
+                  descrption:
+                    type: string
+        '409':
+          description: Entered Data already exists in the database
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: InternalServerError
+  /api/auth/signin:
+    post:
+      tags:
+        - AddressBook
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/LogInDTO'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogInDTO'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/LogInDTO'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/LogInDTO'
+      responses:
+        '200':
+          description: Login successfull
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  jwt :
+                    type: string 
+                    example : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9qfqcjhqwcuinjcpoiqjuocnub
+                  type:
+                    type: string
+                    example : 
+                      Bearer
+        '400':
+          description: Entered wrong data
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+          
+        '401':
+          description: Unauthorised Credentials
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: InternalServerError
+  /api/account/count:
+    get:
+      tags:
+        - AddressBook
+      responses:
+        '200':
+          description: Success get the count of addressbooks in the database
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ResponseGetCountDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseGetCountDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ResponseGetCountDTO'
+        '401':
+          description: Unauthorised Credentials
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  type:
+                    type: string 
+                  descrption:
+                    type: string
+        '500':
+          description: InternalServerError
+  /api/meta-data/ref-set/{key}: 
+    get:
+      tags :
+        - AddressBook
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+            format: string
+      responses :
+        '200':
+          description: Sucessfully retervied all metadata linked to the key
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  id:
+                    type: string 
+                    example : 4adab962-e8c7-489d-b9eb-2d76c8cc30a2
+                  descrption:
+                    type: string 
+                    example : work type 
+                  key : 
+                    type : string 
+                    example : WORK
+                    
+        '401':
+          description: Unauthorised Credentials 
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '404':
+          description: No meta data found with the key
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: InternalServerError
+    
+  /api/asset:
+    post:
+      tags:
+        - AddressBook
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+            encoding:
+              file:
+                style: form
+          
+      responses:
+        '200':
+          description: File Uploaded succesfully
+          
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/UploadResponseDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponseDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponseDTO'
+        '401': 
+          description: UnAuthorised Credentails
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  type:
+                    type: string 
+                  descrption:
+                    type: string
+        '500':
+          description: InternalServerError
+  /api/asset/{id}:
+    get:
+      tags:
+        - AddressBook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content :
+            image/png:
+              schema :
+                type: string 
+                format: Binary
+                example : Binary
+              
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '401':
+          description: UnAuthorised
+          content:
+            application/json:
+              schema :
+                type: object
+                properties:
+                  type:
+                    type: string 
+                  descrption:
+                    type: string
+        '500':
+          description: InternalServerError
+components:
+  schemas:
+    AddressDTO:
+      required:
+        - city
+        - country
+        - line1
+        - state_name
+        - type
+        - zipcode
+      type: object
+      properties:
+        line1:
+          minLength: 1
+          type: string
+          example :
+            "s -1"
+        line2:
+          type: string
+          nullable: true
+          example :
+            s-2
+        city:
+          minLength: 1
+          type: string
+          example :
+            vizag
+        zipcode:
+          minLength: 1
+          type: string
+          example :
+            531116
+        state_name:
+          minLength: 1
+          type: string
+          example:
+            Andhra
+        country:
+          $ref: '#/components/schemas/TypeDTO'
+        type:
+          $ref: '#/components/schemas/TypeDTO'
+      additionalProperties: false
+    EmailDTO:
+      required:
+        - email_address
+        - type
+      type: object
+      properties:
+        email_address:
+          minLength: 1
+          pattern: ^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$
+          
+          example :
+            addressbook@gamil.com
+        type:
+          $ref: '#/components/schemas/TypeDTO'
+      additionalProperties: false
+    ErrorDTO:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+      additionalProperties: false
+    LogInDTO:
+      required:
+        - password
+        - user_name
+      type: object
+      properties:
+        user_name:
+          minLength: 1
+          type: string
+        password:
+          minLength: 1
+          type: string
+      additionalProperties: false
+    PhoneDTO:
+      required:
+        - phone_number
+        - type
+      type: object
+      properties:
+        phone_number:
+          minLength: 1
+          pattern: ^[6-9]\d{9}$
+          type: string
+          example :
+            8142255769
+        type:
+          $ref: '#/components/schemas/TypeDTO'
+      additionalProperties: false
+    ResponseGetCountDTO:
+      type: object
+      properties:
+        count:
+          type: integer 
+          example: 1
+      additionalProperties: false
+    SignupDTO:
+      required:
+        - password
+        - user_name
+      type: object
+      properties:
+        user_name:
+          minLength: 1
+          type: string
+        password:
+          minLength: 1
+          pattern: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,15}$
+          type: string
+      additionalProperties: false
+    TypeDTO:
+      type: object
+      properties:
+        key:
+          type: string
+          "format": "uuid"
+          nullable: true
+      additionalProperties: false
+    UploadResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        file_name:
+          type: string
+          nullable: true
+        downloadURL:
+          type: string
+          nullable: true
+        fileType:
+          type: string
+          nullable: true
+        size:
+          type: integer
+          format: int64
+        fileContent:
+          type: string
+          nullable: true
+      additionalProperties: false
+    UserDTO:
+      required:
+        - address
+        - email
+        - first_name
+        - phone
+      type: object
+      properties:
+        first_name:
+          minLength: 1
+          pattern: ^[a-zA-Z]+$
+          type: string
+          example :
+            "addressBook"
+        last_name:
+          pattern: ^[a-zA-Z]+$
+          type: string
+          example :
+            "API"
+          nullable: true
+        address:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressDTO'
+      #  assetDTO:
+    #      type: array
+       #   items:
+           # $ref: '#/components/schemas/AssetDTO'
+          nullable: true
+        email:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailDTO'
+        phone:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneDTO'
+      additionalProperties: false
+    create:
+        type: object 
+        properties:
+          id:
+            example : db832e90-8701-4cf8-ae31-66898f44e407
+          first_name:
+            type: string 
+            example : surya
+          last_name :
+            type: string 
+            example : raju 
+          email:
+            type: array
+            items :
+              type : object
+              properties:
+                email_address :
+                  type: string 
+                  example: suryaraju@gmail.com 
+                type:
+                  items:
+                    type : object 
+                    properties :
+                      key:
+                        type: integer 
+                        example: WORK
+                      
+          address :
+            type: array 
+            items :
+              type: object 
+              properties:
+                line1:
+                  type: string 
+                  example: 12131 
+                line2 :
+                  type: string 
+                  example: street 
+                city :
+                  type : string 
+                  example: chennai 
+                zipcode :
+                  type : string 
+                  example: 69991 
+                state_name :
+                  type : string 
+                  example: ANDHRA 
+                type:
+                  type: array  
+                  items:
+                    properties:
+                      key :
+                        type: integer
+                        example: WORK
+                country:
+                  type: object 
+                  properties:
+                    key:
+                      type: string 
+                      example: "INDIA"
+          phone:
+            type: array 
+            items:
+              type: object
+              properties:
+                phone_number:
+                  type: string
+                  example: 9872981231 
+                type:
+                  type: array  
+                  items:
+                    properties:
+                      key :
+                        type: integer
+                        example: "WORK"
+ 
+          #assetDTO :
+            # type: array 
+            # items:
+            #   type: object
+            #   properties:
+            #     fileId: 
+            #       type: string
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
